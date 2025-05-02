@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>MOS Test with Confidence per Sample</title>
+  <title>English Dialect Perception Test</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     .hidden { display: none; }
@@ -16,9 +16,9 @@
 
 <!-- Consent Page -->
 <div id="consentPage">
-<h1>Dialect Evaluation</h1>
+<h1>English Dialect Perception Test</h1>
     <div>
-      <h3>Task Overview:</h3>
+      <h2>Task Overview:</h2>
       <p>
         The goal of this task is to evaluate the <strong>regional dialect</strong> of each speech sample.
         Please listen carefully to each audio clip and select the corresponding regional dialect.
@@ -40,9 +40,38 @@
     
       <p>We sincerely appreciate your participation and careful attention!</p>
       </div>
+<hr>
+<h2>Instructions</h2>
+
+<ol>
+    <li>
+      There are a total of <strong>48 speech samples</strong>. The task is expected to take approximately <strong>15–20 minutes</strong>.
+    </li>
+    <li>
+      Please complete the test in a <strong>quiet environment using headphones</strong> for best audio quality and accurate evaluation.
+    </li>
+    <li>
+      For each sample, you will:
+      <ul>
+        <li><strong>Listen</strong> to the speech sample</li>
+        <li><strong>Select</strong> the regional dialect</li>
+        <li><strong>Rate</strong> your confidence in your judgment</li>
+      </ul>
+      Once both responses are selected, click <strong>Next</strong> to continue to the following sample.
+    </li>
+    <li>
+      Before the main test, you will complete a brief <strong>trial session</strong> to get familiar with the task format.
+    </li>
+    <li>
+      After completing the task, <strong>return to MTurk and submit your confirmation code</strong>. This code is generated only once. You may not be compensated if you fail to submit it.
+    </li>
+  </ol>
+  
+
+<hr>
   <h2>Consent Form</h2>
   <p>
-    You are invited to participate in a speech evaluation study. In this task, you will listen to audio samples and rate their regional dialect. Your participation is voluntary, and you may withdraw at any time.
+    You are invited to participate in a speech evaluation study. In this task, you will listen to audio samples and evaluate their regional dialect. Your participation is voluntary, and you may withdraw at any time.
   </p>
   <p>
     No personal identifying information will be collected. By clicking "I Agree," you confirm that you are a native speaker of English, at least 18 years old, and voluntarily consent to participate.
@@ -79,6 +108,14 @@
             <option value="Nonnative">I am not a native speaker of English</option>
 </select><br><br>
 
+<h3>What are you evaluating in this task?</h3>
+<div class="rating">
+  <label><input type="radio" name="eval1" value="naturalness" required>naturalness</label>
+  <label><input type="radio" name="eval1" value="speaker">speaker similarity</label>
+  <label><input type="radio" name="eval1" value="dialect">dialect</label>
+  <label><input type="radio" name="eval1" value="emotion">emotion</label>
+  <label><input type="radio" name="eval1" value="fluency">fluency</label>
+  </div>
 
     <button class="button" onclick="submitInfo()">Submit & Start Trials</button>
   </div>
@@ -95,21 +132,21 @@
 <div id="getReadyPage" class="hidden">
   <h2>Get Ready!</h2>
   <p>You’ve completed the trial session. The actual evaluation test begins now.</p>
-  <p>Please pay close attention to each audio and provide your honest ratings.</p>
+  <p>Please pay close attention to each audio and provide your best judgement.</p>
   <button class="button" onclick="startTest()">Start Test</button>
 </div>
 
 <!-- Main Test Page -->
 <div id="mosTestPage" class="hidden">
-  <h2>Main MOS Test</h2>
-  <p>Listen to each sample and rate both the dialect and your confidence before moving to the next.</p>
+  <h2>Main Test</h2>
+  <p>Listen to each sample and evaluate both the dialect and your confidence before moving to the next.</p>
   <div id="testSampleContainer"></div>
 </div>
 
 <!-- Thank You Page -->
 <div id="thankYouPage" class="hidden">
     <h2>Thank You!</h2>
-    <p>Your responses have been recorded and downloaded successfully.</p>
+    <p>Your responses have been recorded successfully.</p>
     <p>We sincerely appreciate your participation in this study.</p>
     <p><strong>Your completion code:</strong></p>
     <p style="font-size: 24px; font-weight: bold;" id="completionCode">LOADING...</p>
@@ -120,17 +157,19 @@
   </div>
 
 <script>
+
+    const taskId = 'MOS'
   // Sample data (replace with your actual file URLs)
   const trialSamples = [
-    { id: 'T1', url: 'audio/trial1.wav' },
-    { id: 'T2', url: 'audio/trial2.wav' }
+    { id: 'T1', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/test/p225_006_mic1_ema_syn_uk_dict_North-America_0.0_1.0_English_g_0.0_0.0.wav' },
+    { id: 'T2', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/test/p225_006_mic1_ema_syn_uk_dict_North-America_0.0_1.0_English_g_0.0_0.0.wav'}
   ];
   const audioSamples = [
-    { id: '1', url: 'audio/audio1.wav' },
-    { id: '2', url: 'audio/audio2.wav' },
-    { id: '3', url: 'audio/audio3.wav' },
-    { id: '4', url: 'audio/audio4.wav' },
-    { id: '5', url: 'audio/audio5.wav' }
+    { id: '1', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/test/p225_006_mic1_ema_syn_uk_dict_North-America_0.0_1.0_English_g_0.0_0.0.wav'},
+    { id: '2', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/test/p225_006_mic1_ema_syn_uk_dict_North-America_0.0_1.0_English_g_0.0_0.0.wav' },
+    { id: '3', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/test/p225_006_mic1_ema_syn_uk_dict_North-America_0.0_1.0_English_g_0.0_0.0.wav' },
+    { id: '4', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/test/p225_006_mic1_ema_syn_uk_dict_North-America_0.0_1.0_English_g_0.0_0.0.wav' },
+    { id: '5', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/test/p225_006_mic1_ema_syn_uk_dict_North-America_0.0_1.0_English_g_0.0_0.0.wav' }
   ];
 
   let trialIndex = 0;
@@ -211,7 +250,7 @@ function submitInfo() {
         Your browser does not support the audio element.
       </audio>
 
-      <p><strong>Rate the dialect (1–5):</strong></p>
+      <p><strong>Based on this speech sample, which regional dialect does this speaker sound like?</strong></p>
       <div class="rating">${ratingHTML}</div>
 
       <p><strong>How confident are you in your judgement?</strong></p>
@@ -285,10 +324,10 @@ function submitInfo() {
         Your browser does not support the audio element.
       </audio>
 
-      <p><strong>Rate the dialect (1–5):</strong></p>
+      <p><strong>Based on this speech sample, which regional dialect does this speaker sound like?</strong></p>
       <div class="rating">${ratingHTML}</div>
 
-      <p><strong>How confident are you? (1 = Not confident, 5 = Very confident)</strong></p>
+      <p><strong>How confident are you in your judgement?</strong></p>
       <div class="rating">${confidenceHTML}</div>
 
       <button class="button" onclick="nextTest()">Next</button>
@@ -301,7 +340,7 @@ function submitInfo() {
     const selectedConfidence = document.querySelector('input[name="confidenceRating"]:checked');
 
     if (!selectedRating || !selectedConfidence) {
-      alert("Please rate the dialect AND select your confidence before proceeding.");
+      alert("Please evaluate the dialect AND select your confidence before proceeding.");
       return;
     }
 
@@ -323,15 +362,13 @@ function submitInfo() {
 
   const assignmentId = new URLSearchParams(window.location.search).get("assignmentId");
   const payload = {
+    taskId: taskId,
     assignmentId: assignmentId || "",
     completionCode: code,
     responses: results
   };
 
 
-//   const proxy = "https://corsproxy.io/?";
-//   const url = "https://script.google.com/macros/s/AKfycbyFxXvgUHd-ltUPcu7CH_ZP0RcDKy5T1LyZh0at3alZIxSPHgw5lpoPcWHi0aGstOf9NA/exec";
-//   const url = 'https://vercel-relay-git-main-jihwan-lees-projects-7d9b86d8.vercel.app';
 const url = "https://q59ciemhpj.execute-api.us-west-1.amazonaws.com/submit"
   fetch(url, {
     method: "POST",
@@ -344,11 +381,9 @@ const url = "https://q59ciemhpj.execute-api.us-west-1.amazonaws.com/submit"
     alert("Oops! Could not save your results. Please contact the requester.");
   });
 
-    // Upload to S3
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const filename = `response_${code}_${timestamp}.json`;
-//   uploadToS3(results, filename);
-  downloadJSON(results, filename);
+//   downloadJSON(results, filename);
   document.getElementById('thankYouPage').style.display = 'block';
 }
 
@@ -383,69 +418,6 @@ const url = "https://q59ciemhpj.execute-api.us-west-1.amazonaws.com/submit"
     return code;
   }
 
-//   const SUPABASE_URL = 'https://nbaommnrlffjqchdsqtg.supabase.co';
-//   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iYW9tbW5ybGZmanFjaGRzcXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxNTc2MDksImV4cCI6MjA2MTczMzYwOX0.-4KU4wbnvgbDI4qm0rojsrRU5rBgPKEZhfGp-qPTAEM';
-
-//   function submitResponse() {
-// //   const mos = document.querySelector('input[name="mos"]:checked');
-// //   const confidence = document.querySelector('input[name="confidence"]:checked');
-
-// //   if (!mos || !confidence) {
-// //     alert("Please complete both ratings.");
-// //     return;
-// //   }
-
-//   const payload = {
-//     assignment_id: "A12345",
-//     completion_code: "MOS5678",
-//     mos: parseInt(mos.value),
-//     confidence: parseInt(confidence.value)
-//   };
-
-//   fetch(`${SUPABASE_URL}/rest/v1/mos_results`, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       "apikey": SUPABASE_KEY,
-//       "Authorization": `Bearer ${SUPABASE_KEY}`,
-//       "Prefer": "return=minimal"
-//     },
-//     body: JSON.stringify(payload)
-//   })
-//   .then(() => {
-//     document.getElementById("status").innerText = "✅ Submitted to Supabase!";
-//   })
-//   .catch((err) => {
-//     console.error(err);
-//     document.getElementById("status").innerText = "❌ Submission failed.";
-//         alert("Oops! Could not save your results. Please contact the requester.");
-
-//   });
-// }
-//   function uploadToS3(data, filename) {
-//   AWS.config.update({
-//     region: 'us-west-1', // your bucket region
-//     accessKeyId: 'YOUR_ACCESS_KEY_ID',
-//     secretAccessKey: 'YOUR_SECRET_ACCESS_KEY'
-//   });
-
-//   const s3 = new AWS.S3();
-//   const params = {
-//     Bucket: 'jihwan-public',
-//     Key: `250501-neurips/rseponses/${filename}`,
-//     Body: JSON.stringify(data, null, 2),
-//     ContentType: 'application/json'
-//   };
-
-//   s3.putObject(params, function(err, data) {
-//     if (err) {
-//       console.error('Upload failed:', err);
-//       alert('There was an error uploading your response. Please contact the requester.');
-//     } else {
-//       console.log('Successfully uploaded:', filename);
-//     }
-//   });
-// }
 </script>
 
 </body>
