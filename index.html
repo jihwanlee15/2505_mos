@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MOS Test with Confidence per Sample</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .hidden { display: none; }
+    .button { padding: 10px 20px; font-size: 16px; margin-top: 20px; }
+    .rating label { margin-right: 10px; }
+  </style>
+</head>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1487.0.min.js"></script>
+
+<body>
+
+<!-- Consent Page -->
+<div id="consentPage">
+<h1>Dialect Evaluation</h1>
+    <div>
+      <h3>Task Overview:</h3>
+      <p>
+        The goal of this task is to evaluate the <strong>regional dialect</strong> of each speech sample.
+        Please listen carefully to each audio clip and select the corresponding regional dialect.
+        <strong>You must be a native speaker of English to participate in this task.</strong>
+      </p>
+    
+      <h4>Important Notes:</h4>
+      <ul>
+        <li><strong>Submissions from non-native English speakers will be rejected and not compensated.</strong></li>
+        <li>
+          To ensure response quality, a few filler samples with clear, undisputed answers have been included.
+          If you fail to answer <strong>more than half of these correctly</strong>, your work may be rejected and unpaid.
+        </li>
+        <li>
+          If you correctly identify <strong>all the filler samples</strong>, you will receive an
+          <strong>additional bonus reward</strong> for your accuracy and effort.
+        </li>
+      </ul>
+    
+      <p>We sincerely appreciate your participation and careful attention!</p>
+      </div>
+  <h2>Consent Form</h2>
+  <p>
+    You are invited to participate in a speech evaluation study. In this task, you will listen to audio samples and rate their regional dialect. Your participation is voluntary, and you may withdraw at any time.
+  </p>
+  <p>
+    No personal identifying information will be collected. By clicking "I Agree," you confirm that you are a native speaker of English, at least 18 years old, and voluntarily consent to participate.
+  </p>
+  <button class="button" onclick="showParticipantInfo()">I Agree, Continue</button>
+</div>
+
+<!-- Participant Info Page -->
+<div id="participantInfoPage" class="hidden">
+    <h2>Evaluator Information</h2>
+    <p>Please provide a few details before starting:</p>
+  
+    <label>Age: <input type="number" id="ageInput" min="18" required></label><br><br>
+    <label>Gender:
+      <select id="genderInput" required>
+        <option value="">Select</option>
+        <option value="Female">Female</option>
+        <option value="Male">Male</option>
+        <option value="Other">Other</option>
+      </select>
+    </label><br><br>
+  
+    <label>Native Dialect:
+        <select id="nativeInput" required>
+            <option value="">Select</option>
+            <option value="US">US English</option>
+            <option value="Canada">Canadian English</option>
+            <option value="Australia">Australian English</option>
+            <option value="New Zealand">New Zealand English</option>
+            <option value="England">England English</option>
+            <option value="Scotland">Scottish English</option>
+            <option value="Wales">Wales English</option>
+            <option value="Ireland">Ireland English</option>
+            <option value="Nonnative">I am not a native speaker of English</option>
+</select><br><br>
+
+
+    <button class="button" onclick="submitInfo()">Submit & Start Trials</button>
+  </div>
+  
+
+<!-- Trial Page -->
+<div id="trialPage" class="hidden">
+  <h2>Trial Session</h2>
+  <p>Listen to each trial sample and rate it before moving to the next.</p>
+  <div id="trialSampleContainer"></div>
+</div>
+
+<!-- Get Ready Page -->
+<div id="getReadyPage" class="hidden">
+  <h2>Get Ready!</h2>
+  <p>You’ve completed the trial session. The actual evaluation test begins now.</p>
+  <p>Please pay close attention to each audio and provide your honest ratings.</p>
+  <button class="button" onclick="startTest()">Start Test</button>
+</div>
+
+<!-- Main Test Page -->
+<div id="mosTestPage" class="hidden">
+  <h2>Main MOS Test</h2>
+  <p>Listen to each sample and rate both the dialect and your confidence before moving to the next.</p>
+  <div id="testSampleContainer"></div>
+</div>
+
+<!-- Thank You Page -->
+<div id="thankYouPage" class="hidden">
+    <h2>Thank You!</h2>
+    <p>Your responses have been recorded and downloaded successfully.</p>
+    <p>We sincerely appreciate your participation in this study.</p>
+    <p><strong>Your completion code:</strong></p>
+    <p style="font-size: 24px; font-weight: bold;" id="completionCode">LOADING...</p>
+  
+    <p>Return to MTurk and paste this code into the HIT submission box.</p>
+    <!-- <p>Click the button below to return to MTurk and submit your work.</p> -->
+<!-- <a href="https://www.mturk.com/mturk/externalSubmit?assignmentId=${assignmentId}" class="button">Submit to MTurk</a> -->
+  </div>
+
+<script>
+  // Sample data (replace with your actual file URLs)
+  const trialSamples = [
+    { id: 'T1', url: 'audio/trial1.wav' },
+    { id: 'T2', url: 'audio/trial2.wav' }
+  ];
+  const audioSamples = [
+    { id: '1', url: 'audio/audio1.wav' },
+    { id: '2', url: 'audio/audio2.wav' },
+    { id: '3', url: 'audio/audio3.wav' },
+    { id: '4', url: 'audio/audio4.wav' },
+    { id: '5', url: 'audio/audio5.wav' }
+  ];
+
+  let trialIndex = 0;
+  let testIndex = 0;
+  const results = {};
+
+
+
+  // Shuffle utility
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  function showParticipantInfo() {
+  document.getElementById('consentPage').style.display = 'none';
+  document.getElementById('participantInfoPage').style.display = 'block';
+}
+
+function submitInfo() {
+  const age = document.getElementById('ageInput').value;
+  const gender = document.getElementById('genderInput').value;
+  const native = document.getElementById('nativeInput').value;
+
+  if (!age || !gender || !native) {
+    alert("Please fill in all required fields before proceeding.");
+    return;
+  }
+  document.getElementById('participantInfoPage').style.display = 'none';
+
+  results["Participant Info"] = {
+    Age: age,
+    Gender: gender,
+    NativeLanguage: native,
+  };
+
+  startTrials();
+}
+
+
+  // Start trials
+  function startTrials() {
+    // shuffle(trialSamples);
+    document.getElementById('consentPage').style.display = 'none';
+    document.getElementById('trialPage').style.display = 'block';
+    showTrialSample();
+  }
+
+  function showTrialSample() {
+    const container = document.getElementById('trialSampleContainer');
+    container.innerHTML = '';
+
+    if (trialIndex >= trialSamples.length) {
+      showGetReady();
+      return;
+    }
+
+    const sample = trialSamples[trialIndex];
+    const div = document.createElement('div');
+
+    const scaleOptions = ["North American English (US or Canada)", "British Isles English (UK or Ireland)", "Oceanian English (Australia or New Zealand)"];
+    shuffle(scaleOptions);
+    let ratingHTML = '';
+    scaleOptions.forEach(value => {
+      ratingHTML += `<label><input type="radio" name="trialRating" value="${value}" required> ${value}</label>`;
+    });
+    let confidenceHTML = '';
+    ["Not at all confident", "Sligntly confident", "Moderately confident", "Very confident", "Extermely confident"].forEach(value => {
+      confidenceHTML += `<label><input type="radio" name="trialConfidenceRating" value="${value}" required> ${value}</label>`;
+    });
+
+    div.innerHTML = `
+      <p><strong>Trial Sample</strong></p>
+      <audio controls id="trialAudio">
+        <source src="${sample.url}" type="audio/wav">
+        Your browser does not support the audio element.
+      </audio>
+
+      <p><strong>Rate the dialect (1–5):</strong></p>
+      <div class="rating">${ratingHTML}</div>
+
+      <p><strong>How confident are you in your judgement?</strong></p>
+      <div class="rating">${confidenceHTML}</div>
+
+      <button class="button" onclick="nextTrial()">Next</button>
+    `;
+    container.appendChild(div);
+  }
+
+  function nextTrial() {
+    const selectedRating = document.querySelector('input[name="trialRating"]:checked');
+    const selectedConfidence = document.querySelector('input[name="trialConfidenceRating"]:checked');
+
+    if (!selectedRating || !selectedConfidence) {
+      alert("Please rate the dialect AND select your confidence before proceeding.");
+      return;
+    }
+    results[`Trial ${trialSamples[trialIndex].id}`] = {
+    MOS: selectedRating.value,
+    Confidence: selectedConfidence.value
+  };
+  
+  trialIndex++;
+    showTrialSample();
+  }
+
+
+
+
+  function showGetReady() {
+    document.getElementById('trialPage').style.display = 'none';
+    document.getElementById('getReadyPage').style.display = 'block';
+  }
+
+  function startTest() {
+    shuffle(audioSamples);
+    document.getElementById('getReadyPage').style.display = 'none';
+    document.getElementById('mosTestPage').style.display = 'block';
+    showTestSample();
+  }
+
+  function showTestSample() {
+    const container = document.getElementById('testSampleContainer');
+    container.innerHTML = '';
+
+    if (testIndex >= audioSamples.length) {
+      finishTest();
+      return;
+    }
+
+    const sample = audioSamples[testIndex];
+    const div = document.createElement('div');
+
+    const scaleOptions = ["North American English (US or Canada)", "British Isles English (UK or Ireland)", "Oceanian English (Australia or New Zealand)"];
+    shuffle(scaleOptions);
+    let ratingHTML = '';
+    scaleOptions.forEach(value => {
+      ratingHTML += `<label><input type="radio" name="testRating" value="${value}" required> ${value}</label>`;
+    });
+
+    let confidenceHTML = '';
+    ["Not at all confident", "Sligntly confident", "Moderately confident", "Very confident", "Extermely confident"].forEach(value => {
+      confidenceHTML += `<label><input type="radio" name="confidenceRating" value="${value}" required> ${value}</label>`;
+    });
+
+    div.innerHTML = `
+      <p><strong>Sample </strong></p>
+      <audio controls id="testAudio">
+        <source src="${sample.url}" type="audio/wav">
+        Your browser does not support the audio element.
+      </audio>
+
+      <p><strong>Rate the dialect (1–5):</strong></p>
+      <div class="rating">${ratingHTML}</div>
+
+      <p><strong>How confident are you? (1 = Not confident, 5 = Very confident)</strong></p>
+      <div class="rating">${confidenceHTML}</div>
+
+      <button class="button" onclick="nextTest()">Next</button>
+    `;
+    container.appendChild(div);
+  }
+
+  function nextTest() {
+    const selectedRating = document.querySelector('input[name="testRating"]:checked');
+    const selectedConfidence = document.querySelector('input[name="confidenceRating"]:checked');
+
+    if (!selectedRating || !selectedConfidence) {
+      alert("Please rate the dialect AND select your confidence before proceeding.");
+      return;
+    }
+
+    results[`Sample ${audioSamples[testIndex].id}`] = {
+      MOS: selectedRating.value,
+      Confidence: selectedConfidence.value
+    };
+
+    testIndex++;
+    showTestSample();
+  }
+
+  function finishTest() {
+  document.getElementById('mosTestPage').style.display = 'none';
+  const code = generateCompletionCode();
+  document.getElementById('completionCode').innerText = code;
+
+  results["completionCode"] = code;
+
+  const assignmentId = new URLSearchParams(window.location.search).get("assignmentId");
+  const payload = {
+    assignmentId: assignmentId || "",
+    completionCode: code,
+    responses: results
+  };
+  const proxy = "https://corsproxy.io/?";
+  const url = "https://script.google.com/macros/s/AKfycbyFxXvgUHd-ltUPcu7CH_ZP0RcDKy5T1LyZh0at3alZIxSPHgw5lpoPcWHi0aGstOf9NA/exec";
+
+  fetch(proxy+url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  }).then(res => console.log("✅ Submitted to Google Sheets")).catch(err => {
+    console.error("❌ Upload failed:", err);
+    alert("Oops! Could not save your results. Please contact the requester.");
+  });
+
+    // Upload to S3
+//   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+//   const filename = `response_${code}_${timestamp}.json`;
+//   uploadToS3(results, filename);
+//   downloadJSON(results, 'MOS_results.json');
+  document.getElementById('thankYouPage').style.display = 'block';
+}
+
+  // Prevent multiple audios from playing at once
+  document.addEventListener('play', function(e){
+    const audios = document.getElementsByTagName('audio');
+    for(let i = 0; i < audios.length; i++){
+      if(audios[i] !== e.target){
+        audios[i].pause();
+        audios[i].currentTime = 0;
+      }
+    }
+  }, true);
+
+  // Download JSON locally
+  function downloadJSON(obj, filename){
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", filename);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  }
+
+  function generateCompletionCode() {
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "";
+    for (let i = 0; i < 8; i++) {
+      code += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return code;
+  }
+//   function uploadToS3(data, filename) {
+//   AWS.config.update({
+//     region: 'us-west-1', // your bucket region
+//     accessKeyId: 'YOUR_ACCESS_KEY_ID',
+//     secretAccessKey: 'YOUR_SECRET_ACCESS_KEY'
+//   });
+
+//   const s3 = new AWS.S3();
+//   const params = {
+//     Bucket: 'jihwan-public',
+//     Key: `250501-neurips/rseponses/${filename}`,
+//     Body: JSON.stringify(data, null, 2),
+//     ContentType: 'application/json'
+//   };
+
+//   s3.putObject(params, function(err, data) {
+//     if (err) {
+//       console.error('Upload failed:', err);
+//       alert('There was an error uploading your response. Please contact the requester.');
+//     } else {
+//       console.log('Successfully uploaded:', filename);
+//     }
+//   });
+// }
+</script>
+
+</body>
+</html>
