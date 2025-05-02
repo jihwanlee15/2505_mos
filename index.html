@@ -327,10 +327,10 @@ function submitInfo() {
     completionCode: code,
     responses: results
   };
-  const proxy = "https://corsproxy.io/?";
+//   const proxy = "https://corsproxy.io/?";
   const url = "https://script.google.com/macros/s/AKfycbyFxXvgUHd-ltUPcu7CH_ZP0RcDKy5T1LyZh0at3alZIxSPHgw5lpoPcWHi0aGstOf9NA/exec";
 
-  fetch(proxy+url, {
+  fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
