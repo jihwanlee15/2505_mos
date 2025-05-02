@@ -327,9 +327,12 @@ function submitInfo() {
     completionCode: code,
     responses: results
   };
-//   const proxy = "https://corsproxy.io/?";
-  const url = "https://script.google.com/macros/s/AKfycbyFxXvgUHd-ltUPcu7CH_ZP0RcDKy5T1LyZh0at3alZIxSPHgw5lpoPcWHi0aGstOf9NA/exec";
 
+
+//   const proxy = "https://corsproxy.io/?";
+//   const url = "https://script.google.com/macros/s/AKfycbyFxXvgUHd-ltUPcu7CH_ZP0RcDKy5T1LyZh0at3alZIxSPHgw5lpoPcWHi0aGstOf9NA/exec";
+//   const url = 'https://vercel-relay-git-main-jihwan-lees-projects-7d9b86d8.vercel.app';
+const url = "https://jrqk50y9y3.execute-api.us-west-1.amazonaws.com/default/test"
   fetch(url, {
     method: "POST",
     headers: {
@@ -342,10 +345,10 @@ function submitInfo() {
   });
 
     // Upload to S3
-//   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-//   const filename = `response_${code}_${timestamp}.json`;
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filename = `response_${code}_${timestamp}.json`;
 //   uploadToS3(results, filename);
-//   downloadJSON(results, 'MOS_results.json');
+  downloadJSON(results, filename);
   document.getElementById('thankYouPage').style.display = 'block';
 }
 
@@ -379,6 +382,46 @@ function submitInfo() {
     }
     return code;
   }
+
+//   const SUPABASE_URL = 'https://nbaommnrlffjqchdsqtg.supabase.co';
+//   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iYW9tbW5ybGZmanFjaGRzcXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxNTc2MDksImV4cCI6MjA2MTczMzYwOX0.-4KU4wbnvgbDI4qm0rojsrRU5rBgPKEZhfGp-qPTAEM';
+
+//   function submitResponse() {
+// //   const mos = document.querySelector('input[name="mos"]:checked');
+// //   const confidence = document.querySelector('input[name="confidence"]:checked');
+
+// //   if (!mos || !confidence) {
+// //     alert("Please complete both ratings.");
+// //     return;
+// //   }
+
+//   const payload = {
+//     assignment_id: "A12345",
+//     completion_code: "MOS5678",
+//     mos: parseInt(mos.value),
+//     confidence: parseInt(confidence.value)
+//   };
+
+//   fetch(`${SUPABASE_URL}/rest/v1/mos_results`, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       "apikey": SUPABASE_KEY,
+//       "Authorization": `Bearer ${SUPABASE_KEY}`,
+//       "Prefer": "return=minimal"
+//     },
+//     body: JSON.stringify(payload)
+//   })
+//   .then(() => {
+//     document.getElementById("status").innerText = "✅ Submitted to Supabase!";
+//   })
+//   .catch((err) => {
+//     console.error(err);
+//     document.getElementById("status").innerText = "❌ Submission failed.";
+//         alert("Oops! Could not save your results. Please contact the requester.");
+
+//   });
+// }
 //   function uploadToS3(data, filename) {
 //   AWS.config.update({
 //     region: 'us-west-1', // your bucket region
