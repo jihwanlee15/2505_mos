@@ -14,8 +14,8 @@
 
 <body>
 
-<!-- Consent Page -->
-<div id="consentPage">
+<!-- Overview Page -->
+<div id="overviewPage">
 <h1>English Dialect Perception Test</h1>
     <div>
       <h2>Task Overview:</h2>
@@ -29,11 +29,11 @@
       <ul>
         <li><strong>Submissions from non-native English speakers will be rejected and not compensated.</strong></li>
         <li>
-          To ensure response quality, a few filler samples with clear, undisputed answers have been included.
+          To ensure response quality, some speech samples with clear, undisputed answers have been included.
           If you fail to answer <strong>more than half of these correctly</strong>, your work may be rejected and unpaid.
         </li>
         <li>
-          If you correctly identify <strong>all the filler samples</strong>, you will receive an
+          If you correctly identify <strong>all these samples</strong>, you will receive an
           <strong>additional bonus reward</strong> for your accuracy and effort.
         </li>
       </ul>
@@ -41,11 +41,16 @@
       <p>We sincerely appreciate your participation and careful attention!</p>
       </div>
 <hr>
+<button class="button" onclick="showInstructions()">I understood the task overview and the important notes.</button>
+</div>
+
+<!-- instruction page-->
+<div id="instructionPage" class="hidden">
 <h2>Instructions</h2>
 
 <ol>
     <li>
-      There are a total of <strong>24 speech samples</strong>. The task is expected to take approximately <strong>15–20 minutes</strong>.
+      The task is expected to take approximately <strong>15–20 minutes</strong>.
     </li>
     <li>
       Please complete the test in a <strong>quiet environment using headphones</strong> for best audio quality and accurate evaluation.
@@ -67,8 +72,11 @@
     </li>
   </ol>
   
-
 <hr>
+<button class="button" onclick="showConsent()">I carefully read and understood the instructions, Continue</button>
+</div>
+
+<div id="consentPage" class="hidden">
   <h2>Consent Form</h2>
   <p>
     You are invited to participate in a speech evaluation study. In this task, you will listen to audio samples and evaluate their regional dialect. Your participation is voluntary, and you may withdraw at any time.
@@ -76,6 +84,7 @@
   <p>
     No personal identifying information will be collected. By clicking "I Agree," you confirm that you are a native speaker of English, at least 18 years old, and voluntarily consent to participate.
   </p>
+  <hr>
   <button class="button" onclick="showParticipantInfo()">I Agree, Continue</button>
 </div>
 
@@ -125,6 +134,7 @@
 <div id="trialPage" class="hidden">
   <h2>Trial Session</h2>
   <p>Listen to each trial sample and rate it before moving to the next.</p>
+  <hr>
   <div id="trialSampleContainer"></div>
 </div>
 
@@ -140,6 +150,7 @@
 <div id="mosTestPage" class="hidden">
   <h2>Main Test</h2>
   <p>Listen to each sample and evaluate both the dialect and your confidence before moving to the next.</p>
+  <hr>
   <div id="testSampleContainer"></div>
 </div>
 
@@ -160,6 +171,12 @@
 <div id="uploadingPage" class="hidden">
     <h2>Uploading Your Responses...</h2>
     <p>Please wait a moment while we save your data.</p>
+  </div>
+
+  <!-- Pause Page -->
+<div id="pausePage" class="hidden">
+    <h2>Loading next item...</h2>
+    <p>Please wait a moment....</p>
   </div>
 
   <!-- Thank You Page -->
@@ -228,6 +245,18 @@
   document.getElementById('participantInfoPage').style.display = 'block';
 }
 
+function showInstructions() {
+    document.getElementById('overviewPage').style.display = 'none';
+    document.getElementById('instructionPage').style.display = 'block';
+
+}
+
+function showConsent() {
+    document.getElementById('instructionPage').style.display = 'none';
+    document.getElementById('consentPage').style.display = 'block';
+
+}
+
 function submitInfo() {
   const age = document.getElementById('ageInput').value;
   const gender = document.getElementById('genderInput').value;
@@ -256,12 +285,13 @@ function submitInfo() {
   // Start trials
   function startTrials() {
     // shuffle(trialSamples);
-    document.getElementById('consentPage').style.display = 'none';
+    // document.getElementById('consentPage').style.display = 'none';
     document.getElementById('trialPage').style.display = 'block';
     showTrialSample();
   }
 
   function showTrialSample() {
+
     const container = document.getElementById('trialSampleContainer');
     container.innerHTML = '';
 
@@ -272,6 +302,14 @@ function submitInfo() {
 
     const sample = trialSamples[trialIndex];
     const div = document.createElement('div');
+
+    document.getElementById('pausePage').style.display = 'block';
+    document.getElementById('trialSampleContainer').style.display = 'none';
+    setTimeout(() => {
+    document.getElementById('pausePage').style.display = 'none';
+    document.getElementById('trialSampleContainer').style.display = 'block';
+
+  }, 700); // 0.7 seconds
 
     const scaleOptions = ["North American English (US or Canada)", "British Isles English (UK or Ireland)", "Oceanian English (Australia or New Zealand)"];
     shuffle(scaleOptions);
@@ -343,6 +381,14 @@ function submitInfo() {
     toFinalQuestion();
       return;
     }
+
+    document.getElementById('pausePage').style.display = 'block';
+    document.getElementById('testSampleContainer').style.display = 'none';
+    setTimeout(() => {
+    document.getElementById('pausePage').style.display = 'none';
+    document.getElementById('testSampleContainer').style.display = 'block';
+
+  }, 700); // 0.7 seconds
 
     const sample = audioSamples[testIndex];
     const div = document.createElement('div');
