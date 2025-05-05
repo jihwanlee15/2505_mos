@@ -201,24 +201,81 @@
   const taskId = 'descript-test'
   // Sample data (replace with your actual file URLs)
   const trialSamples = [
-    { id: 'T1', url_ref: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/mos_samples_neurips_250501/p311_006_mic1.wav',
-                para: 'description by para',
-                vox: 'description by vox'
-     },
-     { id: 'T2', url_ref: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/mos_samples_neurips_250501/p311_006_mic1.wav',
-                para: 'description by para',
-                vox: 'description by vox'     },  
-              ];
+  {
+            id: "T1",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb1_dev_id10427_8gmfIQY9n7A_00003.wav",
+            vox: "A man's speech with a distinct American or Canadian accent is very fluent and low-pitched, spoken at a normal speed in a very noisy environment, with a possible hint of sadness.",
+            para: "A man's American-accented speech is deep and low-pitched, spoken hesitantly and at a measured speed in a very noisy environment."
+        },
+        {
+            id: "T2",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_0UdEEk4v520_00013.wav",
+            para: "A Scottish woman speaks in an authoritative, high-pitched, and loud voice, with a fast and flowing delivery, recorded in a slightly noisy environment.",
+            vox: "An adult woman with a distinct Scottish accent speaks fluently and at a normal speed, with crisp and flowing speech, a normal pitch, and a hint of anger."
+        }
+    ];
 
   const audioSamples = [
-  { id: '1-1', url_ref: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/mos_samples_neurips_250501/p311_006_mic1.wav',
-                para: 'description by para',
-                vox: 'description by vox'
-     },
-     { id: '1-2', url_ref: 'https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/mos_samples_neurips_250501/p311_006_mic1.wav',
-                para: 'description by para',
-                vox: 'description by vox'
-     }, ];
+  {
+            id: "1-1",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id01568_tIXwYuSLETk_00110.wav",
+            vox: "An adult woman with a high-pitched voice and a distinct American accent speaks slowly, with some word repetition and possible sadness, in a noisy environment.",
+            para: "An American woman speaks in a loud, high-pitched, and shrill voice, sounding hesitant and speaking slowly in a slightly noisy environment."
+        },
+        {
+            id: "1-2",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_kOj_24FYC0Y_00352.wav",
+            para: "A Scottish woman speaks in a high-pitched, authoritative, and loud voice with a flowing rhythm and measured speed, recorded in a slightly noisy environment.",
+            vox: "The speech sample features an adult female with a distinct Scottish accent, speaking fluently at a normal pitch and speed in a noisy environment, with a likely neutral tone."
+        },
+        {
+            id: "1-3",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06004_afQ4BUmQF-I_00064.wav",
+            vox: "The speech is by an older woman with a distinct American accent, sounding silky yet raspy, spoken at a normal pace and pitch, very fluent, possibly expressing fear, and recorded in a slightly noisy environment.",
+            para: "An American man speaks in a high-pitched, soft, and silky singsong voice at a measured pace, recorded in a slightly clean environment."
+        },
+        {
+            id: "1-4",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_kOj_24FYC0Y_00354.wav",
+            para: "A Scottish woman speaks authoritatively with a high-pitched, loud, and flowing voice at a measured pace in a slightly noisy environment.",
+            vox: "An adult female speaks at a normal speed and pitch, with a flowing but somewhat disfluent delivery marked by word repetition. The dialect is very hard to identify, her tone is possibly neutral, and the recording is slightly noisy."
+        },
+        {
+            id: "1-5",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id02264_bTW6Y3khYww_00128.wav",
+            para: "A loud American man with a medium-pitched, crisp voice speaks at a measured speed, but is hesitant and stammering in a slightly clean environment.",
+            vox: "A senior man's voice with a romantic European accent sounds husky and normal in pitch, speaking at a normal speed with a possible hint of contempt."
+        },
+        {
+            id: "1-6",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id01094_QFdfM9cUV5g_00085.wav",
+            vox: "An adult woman speaks in a distinct American dialect, at a normal pitch and speed, with very fluent delivery, possibly expressing surprise.",
+            para: "An American woman speaks quickly with a flowing, high-pitched, nasal, and somewhat shrill voice in a slightly clean environment."
+        },
+        {
+            id: "1-7",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_eilT9Icgk3g_00305.wav",
+            vox: "An adult woman with a distinct Scottish accent speaks fluently and at a normal speed, with a flowing rhythm and normal pitch, in a clear environment, possibly expressing happiness.",
+            para: "A Scottish woman speaks in a loud, high-pitched, authoritative voice at a fast, flowing pace, with a slightly noisy background."
+        },
+        {
+            id: "1-8",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id00111_FXhLWLdlSYo_00081.wav",
+            para: "A Polish woman speaks in a medium-pitched, shrill yet silky voice, sounding hesitant and stammering, with measured speed, in a noisy environment.",
+            vox: "A young adult woman with a Germanic or Slavic accent speaks at a normal speed and pitch, sounding silky and slightly hesitant, in a noisy environment with a generally neutral tone."
+        },
+        {
+            id: "1-9",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id00111_d0liSZ1OT4s_00207.wav",
+            para: "A Polish woman speaks in a shrill yet silky, medium-pitched voice with a hesitant, stammering manner at a measured speed, recorded in a very noisy environment.",
+            vox: "A young adult woman with a distinct romantic accent speaks softly and hesitantly at a normal speed. Her voice is nasal, low-pitched, and somewhat pitchy, conveying strong happiness, though the recording is very noisy."
+        },
+        {
+            id: "1-10",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id00051_rAMd2bn-vNQ_00277.wav",
+            para: "A man's low-pitched, deep voice with an Australian accent is delivered in a measured, singsong manner, recorded in a very noisy environment.",
+            vox: "An adult man with a husky voice speaks at a normal speed and pitch, sounding happy, amused, and excited, but with some disfluency and interjections, in a very noisy environment. His dialect is very hard to identify."
+        }, ];
 
   let trialIndex = 0;
   let testIndex = 0;
