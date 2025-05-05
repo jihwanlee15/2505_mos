@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,6 +9,20 @@
     .hidden { display: none; }
     .button { padding: 10px 20px; font-size: 16px; margin-top: 20px; }
     .rating label { margin-right: 10px; }
+
+  td.radio-cell {
+    cursor: pointer;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+  }
+  td.radio-cell input[type="radio"] {
+    display: none;
+  }
+  td.radio-cell.selected {
+    background-color: #d0ebff;
+    font-weight: bold;
+  }
   </style>
 </head>
 <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1487.0.min.js"></script>
@@ -345,6 +360,17 @@ function submitInfo() {
     showTrialSample();
   }
 
+  const influenceOptions = [
+  "Sex",
+  "Age",
+  "Dialect",
+  "Emotion",
+  "Fluency",
+  "Timbre"
+];
+
+const numAspects = influenceOptions.length;
+
   function showTrialSample() {
 
     const container = document.getElementById('trialSampleContainer');
@@ -374,19 +400,50 @@ function submitInfo() {
 
   }, 700); // 0.7 seconds
 
-    const influenceOptions = [
-  "Sex",
-  "Age",
-  "Dialect",
-  "Emotion",
-  "Fluency",
-  "Timbre"
-];
+//     const influenceOptions = [
+//   "Sex",
+//   "Age",
+//   "Dialect",
+//   "Emotion",
+//   "Fluency",
+//   "Timbre"
+// ];
+
+// const numAspects = influenceOptions.length;
+
  shuffle(influenceOptions);
 
-const influenceHTML = influenceOptions.map(opt =>
-  `<label><input type="checkbox" name="influences" value="${opt}"> ${opt}</label><br>`
-).join('');
+// const influenceHTML = influenceOptions.map(opt =>
+//   `<label><input type="radio" name="influences" value="${opt}"> ${opt}</label><br>`
+// ).join('');
+
+let influenceHTML = `
+  <table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>A is better</th>
+        <th>Similar</th>
+        <th>B is better</th>
+      </tr>
+    </thead>
+    <tbody>
+`;
+
+influenceOptions.forEach((opt, i) => {
+  const name = `influence_${i}`;
+  influenceHTML += `
+    <tr>
+      <td>${opt}</td>
+      <td align="center"><input type="radio" name="${name}" value="${first.label}"></td>
+      <td align="center"><input type="radio" name="${name}" value="Similar"></td>
+      <td align="center"><input type="radio" name="${name}" value="${second.label}"></td>
+    </tr>
+  `;
+});
+
+influenceHTML += `</tbody></table>`;
+
 
 let ratingHTML = '';
     // scaleOptions.forEach(value => {
@@ -421,7 +478,7 @@ let ratingHTML = '';
       <p><strong>After listening to the audio sample, which text description better matches the speaker?</strong></p>
       <div class="rating">${choiceHTML}</div>
 
-      <p><strong>What is the main reason of your choice? In which aspect is the selected description better than the other? (Select all that apply)</strong></p>
+      <p><strong>What is the main reason of your choice? In which aspect is the selected description better than the other?</strong></p>
       <div class="rating">${influenceHTML}</div>
 
       <p><strong>How confident are you in your judgement?</strong></p>
@@ -435,16 +492,30 @@ let ratingHTML = '';
   function nextTrial() {
     const selected = document.querySelector('input[name="selectedText"]:checked');
     const selectedConfidence = document.querySelector('input[name="trialConfidenceRating"]:checked');
-    const influences = Array.from(document.querySelectorAll('input[name="influences"]:checked')).map(el => el.value);
+    // const influences = Array.from(document.querySelectorAll('input[name="influences"]:checked')).map(el => el.value);
+    const influenceRatings = {};
 
-    if (!selected || !selectedConfidence || !influences) {
+    for (let i = 0; i < influenceOptions.length; i++) {
+  const selected = document.querySelector(`input[name="influence_${i}"]:checked`);
+  if (selected) {
+    const aspect = influenceOptions[i];
+    influenceRatings[aspect] = selected.value;
+  }
+}
+    let filled = 0;
+    for (let i = 0; i < numAspects; i++) {
+  if (document.querySelector(`input[name="influence_${i}"]:checked`)) {
+    filled++;
+  }
+}
+    if (!selected || !selectedConfidence || filled<numAspects) {
       alert("Please select all the categories AND your confidence before proceeding.");
       return;
     }
     results[`Trial ${trialSamples[trialIndex].id}`] = {
     Text: selected.value,
     Confidence: selectedConfidence.value,
-    Reasons: influences
+    Reasons: influenceRatings
   };
   
   trialIndex++;
@@ -497,19 +568,46 @@ let ratingHTML = '';
     // const scaleOptions = ["Very different", "Quite different", "Somewhat similar", "Quite similar", "Very similar"];
     // shuffle(scaleOptions);
 
-    const influenceOptions = [
-  "Sex",
-  "Age",
-  "Dialect",
-  "Emotion",
-  "Fluency",
-  "Timbre"
-];
+//     const influenceOptions = [
+//   "Sex",
+//   "Age",
+//   "Dialect",
+//   "Emotion",
+//   "Fluency",
+//   "Timbre"
+// ];
  shuffle(influenceOptions);
 
- const influenceHTML = influenceOptions.map(opt =>
-  `<label><input type="checkbox" name="influences" value="${opt}"> ${opt}</label><br>`
-).join('');
+//  const influenceHTML = influenceOptions.map(opt =>
+//   `<label><input type="checkbox" name="influences" value="${opt}"> ${opt}</label><br>`
+// ).join('');
+
+let influenceHTML = `
+  <table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>A is better</th>
+        <th>Similar</th>
+        <th>B is better</th>
+      </tr>
+    </thead>
+    <tbody>
+`;
+
+influenceOptions.forEach((opt, i) => {
+  const name = `influence_${i}`;
+  influenceHTML += `
+    <tr>
+      <td>${opt}</td>
+      <td align="center"><input type="radio" name="${name}" value="${first.label}"></td>
+      <td align="center"><input type="radio" name="${name}" value="Similar"></td>
+      <td align="center"><input type="radio" name="${name}" value="${second.label}"></td>
+    </tr>
+  `;
+});
+
+influenceHTML += `</tbody></table>`;
     let ratingHTML = '';
     // scaleOptions.forEach(value => {
     //   ratingHTML += `<label><input type="radio" name="testRating" value="${value}" required> ${value}</label>`;
@@ -543,7 +641,7 @@ let ratingHTML = '';
       <p><strong>After listening to the audio sample, which text description better matches the speaker?</strong></p>
       <div class="rating">${choiceHTML}</div>
 
-      <p><strong>What is the main reason of your choice? In which aspect is the selected description better than the other? (Select all that apply)</strong></p>
+      <p><strong>What is the main reason of your choice? In which aspect is the selected description better than the other?</strong></p>
       <div class="rating">${influenceHTML}</div>
 
       <p><strong>How confident are you in your judgement?</strong></p>
@@ -557,9 +655,24 @@ let ratingHTML = '';
   function nextTest() {
     const selected = document.querySelector('input[name="selectedText"]:checked');
     const selectedConfidence = document.querySelector('input[name="confidenceRating"]:checked');
-    const influences = Array.from(document.querySelectorAll('input[name="influences"]:checked')).map(el => el.value);
+    // const influences = Array.from(document.querySelectorAll('input[name="influences"]:checked')).map(el => el.value);
+    const influenceRatings = {};
+    for (let i = 0; i < influenceOptions.length; i++) {
+  const selected = document.querySelector(`input[name="influence_${i}"]:checked`);
+  if (selected) {
+    const aspect = influenceOptions[i];
+    influenceRatings[aspect] = selected.value;
+  }
+}
 
-    if (!selected || !selectedConfidence || !influences) {
+    let filled = 0;
+    for (let i = 0; i < numAspects; i++) {
+  if (document.querySelector(`input[name="influence_${i}"]:checked`)) {
+    filled++;
+  }
+}
+
+    if (!selected || !selectedConfidence || filled<numAspects) {
       alert("Please select all the categories AND your confidence before proceeding.");
       return;
     }
@@ -567,7 +680,7 @@ let ratingHTML = '';
     results[`Sample ${audioSamples[testIndex].id}`] = {
       Text: selected.value,
       Confidence: selectedConfidence.value,
-      Reasons: influences
+      Reasons: influenceRatings
 
     };
 
@@ -654,6 +767,22 @@ setTimeout(() => {
     }
     return code;
   }
+
+  function selectRadio(cell) {
+  const row = cell.parentElement;
+  const inputs = row.querySelectorAll('input[type="radio"]');
+  const cells = row.querySelectorAll('.radio-cell');
+
+  // Clear all selections for this row
+  cells.forEach(c => c.classList.remove('selected'));
+
+  // Select this one
+  cell.classList.add('selected');
+
+  // Check the radio inside
+  const radio = cell.querySelector('input[type="radio"]');
+  if (radio) radio.checked = true;
+}
 
 </script>
 
