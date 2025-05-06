@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -35,8 +36,9 @@
     <div>
       <h2>Task Overview:</h2>
       <p>
-        The goal of this task is to evaluate the text description of each speech sample.
-        Please listen carefully to each audio clip and choose the best text description.
+        The goal of this task is to evaluate a text description of speech samples.
+        Please listen carefully to each audio clip and choose the best description of how the speech sounds and what person speaking it sounds like.
+        <br><br>
         <strong>You must be a native speaker of English to participate in this task.</strong>
       </p>
     
@@ -44,11 +46,11 @@
       <ul>
         <li><strong>Submissions from non-native English speakers will be rejected and not compensated.</strong></li>
         <li>
-          To ensure response quality, some speech samples with clear, undisputed answers have been included.
-          If you fail to answer <strong>more than half of these correctly</strong>, your work may be rejected and unpaid.
+          Some speech samples will have clear, undisputed description; for other samples, the appropriate description will be less obvious.
+          If you fail to correctly select <strong>more than half of the obvious descriptions</strong>, your work may be rejected and unpaid.
         </li>
         <li>
-          If you correctly identify <strong>all these samples</strong>, you will receive an
+          If you <strong>appropriately complete answers to all these samples</strong>, you will receive an
           <strong>additional bonus reward</strong> for your accuracy and effort.
         </li>
       </ul>
@@ -56,7 +58,7 @@
       <p>We sincerely appreciate your participation and careful attention!</p>
       </div>
 <hr>
-<button class="button" onclick="showInstructions()">I understood the task overview and the important notes.</button>
+<button class="button" onclick="showInstructions()">I understood the task overview and the notes on completing the task.</button>
 </div>
 
 <!-- instruction page-->
@@ -73,16 +75,17 @@
     <li>
       For each sample pair, you will:
       <ul>
-        <li><strong>Listen</strong> to a speech sample</li>
-        <li><strong>Compare</strong> two text descriptions of the speech sample and choose the better one</li>
-        <li><strong>Select</strong> all of the reasons of your choice</li>
-        <li><strong>Rate</strong> your confidence in your judgment</li>
+        <li><strong>Listen</strong> to a speech sample, and</li>
+        <li><strong>compare</strong> two text descriptions of the speech sample and choose the better one</li>
+        <li>Then <strong>select</strong> all of the reasons supporting your choice, and</li>
+        <li><strong>rate</strong> your confidence in your judgment</li>
       </ul>
-      Once all of the responses are selected, click <strong>Next</strong> to continue to the following sample.<br>
-      You may listen to each speech sample as many times as you'd like, but you won't be able to go back after clicking the <strong>Next</strong> button.
+      <br>
+      You may listen to each speech sample as many times as you'd like, but you won't be able to go back after moving on to the next sample.
+      Once you have finished making your selections, click <strong>Next</strong> to continue to the next speech sample.<br>
     </li>
     <li>
-      Before the main test, you will complete a brief <strong>trial session</strong> to get familiar with the task format.
+      Before the main task, you will complete a brief <strong>trial</strong> to become familiar with the task format.
     </li>
     <li>
       After completing the task, <strong>return to MTurk and submit your confirmation code</strong>. This code is generated only once. You may not be compensated if you fail to submit it.
@@ -90,7 +93,7 @@
   </ol>
   
 <hr>
-<button class="button" onclick="showConsent()">I carefully read and understood the instructions, Continue</button>
+<button class="button" onclick="showConsent()">I carefully read and understood the instructions. Continue...</button>
 </div>
 
 <div id="consentPage" class="hidden">
