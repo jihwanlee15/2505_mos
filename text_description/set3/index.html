@@ -1,0 +1,799 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Speaker Description Evaluation</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .hidden { display: none; }
+    .button { padding: 10px 20px; font-size: 16px; margin-top: 20px; }
+    .rating label { margin-right: 10px; }
+
+  td.radio-cell {
+    cursor: pointer;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+  }
+  td.radio-cell input[type="radio"] {
+    display: none;
+  }
+  td.radio-cell.selected {
+    background-color: #d0ebff;
+    font-weight: bold;
+  }
+  </style>
+</head>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1487.0.min.js"></script>
+
+<body>
+
+<!-- Overview Page -->
+<div id="overviewPage">
+<h1>Speaker Description Evaluation</h1>
+    <div>
+      <h2>Task Overview:</h2>
+      <p>
+        The goal of this task is to evaluate a text description of speech samples.
+        Please listen carefully to each audio clip and choose the best description of how the speech sounds and what person speaking it sounds like.
+        <br><br>
+        <strong>You must be a native speaker of English to participate in this task.</strong>
+      </p>
+    
+      <h4>Important Notes:</h4>
+      <ul>
+        <li><strong>Submissions from non-native English speakers will be rejected and not compensated.</strong></li>
+        <li>
+          Some speech samples will have clear, undisputed description; for other samples, the appropriate description will be less obvious.
+          If you fail to correctly select <strong>more than half of the obvious descriptions</strong>, your work may be rejected and unpaid.
+        </li>
+        <li>
+          If you <strong>appropriately complete answers to all these samples</strong>, you will receive an
+          <strong>additional bonus reward</strong> for your accuracy and effort.
+        </li>
+      </ul>
+    
+      <p>We sincerely appreciate your participation and careful attention!</p>
+      </div>
+<hr>
+<button class="button" onclick="showInstructions()">I understood the task overview and the notes on completing the task.</button>
+</div>
+
+<!-- instruction page-->
+<div id="instructionPage" class="hidden">
+<h2>Instructions</h2>
+
+<ol>
+    <li>
+      The task is expected to take approximately <strong>15–20 minutes</strong>.
+    </li>
+    <li>
+      Please complete the test in a <strong>quiet environment using headphones</strong> for best audio quality and accurate evaluation.
+    </li>
+    <li>
+      For each sample pair, you will:
+      <ul>
+        <li><strong>Listen</strong> to a speech sample, and</li>
+        <li><strong>compare</strong> two text descriptions of the speech sample and choose the better one</li>
+        <li>Then <strong>select</strong> all of the reasons supporting your choice, and</li>
+        <li><strong>rate</strong> your confidence in your judgment</li>
+      </ul>
+      <!-- <br> -->
+      You may listen to each speech sample as many times as you'd like, but you won't be able to go back after moving on to the next sample.
+      Once you have finished making your selections, click <strong>Next</strong> to continue to the next speech sample.<br>
+    </li>
+    <li>
+      Before the main task, you will complete a brief <strong>trial</strong> to become familiar with the task format.
+    </li>
+    <li>
+      After completing the task, <strong>return to MTurk and submit your confirmation code</strong>. This code is generated only once. You may not be compensated if you fail to submit it.
+    </li>
+    <li>
+      In the following section, you will be asked what you are evaluating. Please select <strong>text description</strong>; otherwise, your submission may be rejected and not compensated. This question is included to ensure that you have carefully read the instructions.    </li>
+  </ol>
+  
+<hr>
+<button class="button" onclick="showConsent()">I carefully read and understood the instructions. Continue...</button>
+</div>
+
+<div id="consentPage" class="hidden">
+  <h2>Consent Form</h2>
+  <p>
+    You are invited to participate in a speech evaluation study. In this task, you will listen to audio samples and evaluate their descriptions of the speech and speakers. No personal identifying information will be collected. Your participation is voluntary, and you may withdraw at any time.
+  </p>
+  <p>
+     By clicking "I Agree," you confirm that you are a native speaker of English, at least 18 years old, and voluntarily consent to participate.
+  </p>
+  <hr>
+  <button class="button" onclick="showParticipantInfo()">I Agree. Continue...</button>
+</div>
+
+<!-- Participant Info Page -->
+<div id="participantInfoPage" class="hidden">
+    <h2>Evaluator Information</h2>
+    <p>Please provide a few details before starting:</p>
+  
+    <label>Age: <input type="number" id="ageInput" min="18" required></label><br><br>
+    <label>Gender:
+      <select id="genderInput" required>
+        <option value="">Select</option>
+        <option value="Female">Female</option>
+        <option value="Male">Male</option>
+        <option value="Other">Other</option>
+      </select>
+    </label><br><br>
+  
+    <label>Native Dialect:
+        <select id="nativeInput" required>
+            <option value="">Select</option>
+            <option value="US">US English</option>
+            <option value="Canada">Canadian English</option>
+            <option value="Australia">Australian English</option>
+            <option value="New Zealand">New Zealand English</option>
+            <option value="England">England English</option>
+            <option value="Scotland">Scottish English</option>
+            <option value="Wales">Wales English</option>
+            <option value="Ireland">Ireland English</option>
+            <option value="Nonnative">I am not a native speaker of English</option>
+</select><br><br>
+
+<h3>What are you evaluating in this task?</h3>
+<p>If you are unsure which option to select, please refresh the page and review the instructions carefully before proceeding.</p>
+<div class="rating">
+  <label><input type="radio" name="eval1" value="naturalness" required>naturalness</label>
+  <label><input type="radio" name="eval1" value="speaker">speaker similarity</label>
+  <label><input type="radio" name="eval1" value="accent">accent</label>
+  <label><input type="radio" name="eval1" value="description">text description</label>
+  <label><input type="radio" name="eval1" value="emotion">emotion</label>
+  <label><input type="radio" name="eval1" value="fluency">fluency</label>
+  </div>
+
+    <button class="button" onclick="submitInfo()">Submit & Start Trials</button>
+  </div>
+  
+
+<!-- Trial Page -->
+<div id="trialPage" class="hidden">
+  <h2>Trial Session</h2>
+  <p>Listen to each trial sample and evaluate it before moving to the next.</p>
+  <hr>
+  <div id="trialSampleContainer"></div>
+</div>
+
+<!-- Get Ready Page -->
+<div id="getReadyPage" class="hidden">
+  <h2>Get Ready!</h2>
+  <p>You’ve completed the trial session. The actual evaluation test begins now.</p>
+  <p>Please pay close attention to each audio and provide your best judgement.</p>
+  <button class="button" onclick="startTest()">Start Test</button>
+</div>
+
+<!-- Main Test Page -->
+<div id="mosTestPage" class="hidden">
+  <h2>Main Test</h2>
+  <p>Listen to each sample and choose the better text description, select all of the reasons, and rate your confidence before moving to the next.</p>
+  <hr>
+  <div id="testSampleContainer"></div>
+</div>
+
+<!-- Final Question Page -->
+<div id="finalQuestionPage" class="hidden">
+    <h3>What were you evaluating in this task?</h3>
+<div class="rating">
+  <label><input type="radio" name="eval2" value="naturalness" required>naturalness</label>
+  <label><input type="radio" name="eval2" value="speaker">speaker similarity</label>
+  <label><input type="radio" name="eval2" value="accent">accent</label>
+  <label><input type="radio" name="eval2" value="description">text description</label>
+  <label><input type="radio" name="eval2" value="emotion">emotion</label>
+  <label><input type="radio" name="eval2" value="fluency">fluency</label>
+  </div>
+    <button class="button" onclick="finishTest()">Submit</button>
+  </div>
+
+<!-- Uploading Page -->
+<div id="uploadingPage" class="hidden">
+    <h2>Uploading Your Responses...</h2>
+    <p>Please wait a moment while we save your data.</p>
+  </div>
+
+  <!-- Pause Page -->
+<div id="pausePage" class="hidden">
+    <h2>Loading next item...</h2>
+    <p>Please wait a moment....</p>
+  </div>
+
+  <!-- Thank You Page -->
+<div id="thankYouPage" class="hidden">
+    <h2>Thank You!</h2>
+    <p>Your responses have been recorded successfully.</p>
+    <p>We sincerely appreciate your participation in this study.</p>
+    <p><strong>Your completion code:</strong></p>
+    <p style="font-size: 24px; font-weight: bold;" id="completionCode">LOADING...</p>
+  
+    <p>Return to MTurk and paste this code into the HIT submission box.</p>
+    <!-- <p>Click the button below to return to MTurk and submit your work.</p> -->
+<!-- <a href="https://www.mturk.com/mturk/externalSubmit?assignmentId=${assignmentId}" class="button">Submit to MTurk</a> -->
+  </div>
+
+<script>
+
+  const taskId = 'descript-set-3'
+  // Sample data (replace with your actual file URLs)
+  const trialSamples = [
+  {
+            id: "T1",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb1_dev_id10427_8gmfIQY9n7A_00003.wav",
+            vox: "A man's speech with a distinct American or Canadian accent is very fluent and low-pitched, spoken at a normal speed in a very noisy environment, with a possible hint of sadness.",
+            para: "A man's American-accented speech is deep and low-pitched, spoken hesitantly and at a measured speed in a very noisy environment."
+        },
+        {
+            id: "T2",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_0UdEEk4v520_00013.wav",
+            para: "A Scottish woman speaks in an authoritative, high-pitched, and loud voice, with a fast and flowing delivery, recorded in a slightly noisy environment.",
+            vox: "An adult woman with a distinct Scottish accent speaks fluently and at a normal speed, with crisp and flowing speech, a normal pitch, and a hint of anger."
+        }
+    ];
+
+  const audioSamples = [
+  {
+            id: "3-1",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_Hy5vF_kYGJc_00119.wav",
+            vox: "An adult woman with a distinct Scottish accent speaks fluently and at a normal pace, with crisp and flowing speech in a noisy environment, possibly expressing contempt.",
+            para: "A Scottish woman speaks authoritatively with a high-pitched, loud, and flowing voice at a measured pace, recorded in a very noisy environment."
+        },
+        {
+            id: "3-2",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_kOj_24FYC0Y_00331.wav",
+            para: "A Scottish woman speaks in a loud, high-pitched, and authoritative voice at a fast, flowing pace, recorded in a noisy environment.",
+            vox: "An adult female speaks with a normal pitch and speed in a noisy environment. Her voice is crisp, flowing, and very fluent, with a possible hint of surprise. The accent is very hard to determine."
+        },
+        {
+            id: "3-3",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id01836_uqyFDkFlkr4_00052.wav",
+            vox: "The speech is by a young adult male with a distinct romance (e.g. French, Spanish) accent, speaking at a normal speed and pitch. He sounds very happy and excited, and the recording environment is slightly clean.",
+            para: "An American man speaks in a medium-pitched, raspy voice at a measured speed, with slurred articulation, recorded in a slightly clean environment."
+        },
+        {
+            id: "3-4",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_YXBojWL7xtU_00208.wav",
+            para: "A Scottish woman speaks in an authoritative, high-pitched, and loud voice, with a fast and flowing delivery, recorded in a slightly noisy environment.",
+            vox: "A definitely female adult with a distinct Scottish accent speaks at a normal pitch and speed, sounding very fluent and possibly contemptuous, in an environment balanced in clarity."
+        },
+        {
+            id: "3-5",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_eVynXGj4eyA_00284.wav",
+            para: "A Scottish woman speaks in a loud, high-pitched, and authoritative voice at a fast and flowing pace, with the recording taking place in a very noisy environment.",
+            vox: "An adult woman with a distinct Germanic (e.g. German) accent speaks fluently and at a normal speed, her tone possibly expressing contempt, in a very noisy environment."
+        },
+        {
+            id: "3-6",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_yNJcqx1yiWw_00494.wav",
+            para: "A Scottish woman speaks in an authoritative, high-pitched, and loud voice with a flowing and measured pace, recorded in an environment with balanced clarity.",
+            vox: "An adult woman with a distinct Scottish accent speaks fluently at a normal speed and pitch, sounding possibly happy, in a clear and balanced environment."
+        },
+        {
+            id: "3-7",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb1_dev_id10141_UNgiwug0gQ0_00013.wav",
+            para: "A Filipino man's voice is high-pitched, nasal, and silky, speaking at a measured speed in a very noisy environment.",
+            vox: "The speech features a young adult woman with a distinct romance (e.g. French, Spanish) accent, speaking at a normal pace in a very noisy environment. Her voice is silky and flowing, with a normal pitch and perhaps a hint of happiness."
+        },
+        {
+            id: "3-8",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id00628_uZvRtwCQs44_00022.wav",
+            para: "A Danish woman speaks in a deep, low-pitched, and husky voice with a raspy texture, delivering her words at a measured pace in a noisy environment.",
+            vox: "The speech is from an older woman with a distinctly romance (e.g. French, Spanish) accent, speaking at a normal speed in a neutral tone. Her voice is low-pitched, very fluent, and recorded in a noisy environment."
+        },
+        {
+            id: "3-9",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id06507_dvd5GgjtpF0_00269.wav",
+            para: "A Scottish woman speaks in an authoritative, loud, and high-pitched voice with a flowing tone at a measured pace, recorded in a noisy environment.",
+            vox: "The speech is from an adult woman with a distinct Scottish accent. Her voice is crisp and flowing, spoken at a normal speed and pitch, though there are some disfluencies with word repetition. There may be an undertone of fear."
+        },
+        {
+            id: "3-10",
+            url_ref: "https://jihwan-public.s3.us-west-1.amazonaws.com/250501-neurips/vox-profile/voxceleb2_dev_id05003_GGBU8VVoppk_00001.wav",
+            vox: "A young adult woman with a likely American or Canadian accent speaks at a normal speed in a noisy environment. Her voice is shrill and at a normal pitch, sounding happy, excited, and somewhat disfluent with some word repetition.",
+            para: "A Canadian woman with a medium-pitched, soft voice speaks quickly and hesitantly in a noisy environment."
+        },
+      ];
+
+  let trialIndex = 0;
+  let testIndex = 0;
+  const results = {};
+
+
+
+  // Shuffle utility
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  function shufflePair(a, b) {
+    return Math.random() < 0.5 ? [a, b] : [b, a];
+  }
+
+  function showParticipantInfo() {
+  document.getElementById('consentPage').style.display = 'none';
+  document.getElementById('participantInfoPage').style.display = 'block';
+}
+
+function showInstructions() {
+    document.getElementById('overviewPage').style.display = 'none';
+    document.getElementById('instructionPage').style.display = 'block';
+
+}
+
+function showConsent() {
+    document.getElementById('instructionPage').style.display = 'none';
+    document.getElementById('consentPage').style.display = 'block';
+
+}
+
+function submitInfo() {
+  const age = document.getElementById('ageInput').value;
+  const gender = document.getElementById('genderInput').value;
+  const native = document.getElementById('nativeInput').value;
+  const eval1 = document.querySelector('input[name="eval1"]:checked').value;
+
+//   const eval1 = document.getElementById('eval1').value;
+
+  if (!age || !gender || !native || !eval1) {
+    alert("Please fill in all required fields before proceeding.");
+    return;
+  }
+  document.getElementById('participantInfoPage').style.display = 'none';
+
+  results["Participant Info"] = {
+    Age: age,
+    Gender: gender,
+    NativeLanguage: native,
+    eval1: eval1
+  };
+
+  startTrials();
+}
+
+
+  // Start trials
+  function startTrials() {
+    // shuffle(trialSamples);
+    // document.getElementById('consentPage').style.display = 'none';
+    document.getElementById('trialPage').style.display = 'block';
+    showTrialSample();
+  }
+
+  const influenceOptions = [
+  "Speaker Sex",
+  "Speaker Age",
+  "Speaker Accent",
+  "Speech Emotion",
+  "Speech Flow (Fluency)",
+  "Speech Sound Quality (Timbre)",
+  "Speech Pitch",
+  "Speech Speed (Tempo)"
+];
+
+const numAspects = influenceOptions.length;
+
+  function showTrialSample() {
+
+    const container = document.getElementById('trialSampleContainer');
+    container.innerHTML = '';
+
+    if (trialIndex >= trialSamples.length) {
+      showGetReady();
+      return;
+    }
+
+    const sample = trialSamples[trialIndex];
+
+     // Randomize order
+  
+     const [first, second] = shufflePair(
+      {label: 'Para', text: sample.para},
+      {label: 'Vox', text:sample.vox}
+     )
+
+    const div = document.createElement('div');
+
+    document.getElementById('pausePage').style.display = 'block';
+    document.getElementById('trialSampleContainer').style.display = 'none';
+    setTimeout(() => {
+    document.getElementById('pausePage').style.display = 'none';
+    document.getElementById('trialSampleContainer').style.display = 'block';
+
+  }, 700); // 0.7 seconds
+
+//     const influenceOptions = [
+//   "Sex",
+//   "Age",
+//   "Dialect",
+//   "Emotion",
+//   "Fluency",
+//   "Timbre"
+// ];
+
+// const numAspects = influenceOptions.length;
+
+ shuffle(influenceOptions);
+
+// const influenceHTML = influenceOptions.map(opt =>
+//   `<label><input type="radio" name="influences" value="${opt}"> ${opt}</label><br>`
+// ).join('');
+
+let influenceHTML = `
+  <table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>A is better</th>
+        <th>The descriptions do not critically differentiate this</th>
+        <th>B is better</th>
+      </tr>
+    </thead>
+    <tbody>
+`;
+
+influenceOptions.forEach((opt, i) => {
+  const name = `influence_${i}`;
+  influenceHTML += `
+    <tr>
+      <td>${opt}</td>
+      <td align="center"><input type="radio" name="${name}" value="${first.label}"></td>
+      <td align="center"><input type="radio" name="${name}" value="Similar"></td>
+      <td align="center"><input type="radio" name="${name}" value="${second.label}"></td>
+    </tr>
+  `;
+});
+
+influenceHTML += `</tbody></table>`;
+
+
+let ratingHTML = '';
+    // scaleOptions.forEach(value => {
+    //   ratingHTML += `<label><input type="radio" name="trialRating" value="${value}" required> ${value}</label>`;
+    // });
+    let confidenceHTML = '';
+    ["Not at all confident", "Slightly confident", "Moderately confident", "Quite confident", "Extremely confident"].forEach(value => {
+      confidenceHTML += `<label><input type="radio" name="trialConfidenceRating" value="${value}" required> ${value}</label>`;
+    });
+
+    const choiceHTML = `
+  <div class="choice">
+    <label style="display: block; border: 1px solid #ccc; padding: 10px; border-radius: 8px; margin-bottom: 10px; cursor: pointer;">
+      <input type="radio" name="selectedText" value="${first.label}" style="margin-right: 10px;"> 
+      <strong>A:</strong> ${first.text}
+    </label>
+    <label style="display: block; border: 1px solid #ccc; padding: 10px; border-radius: 8px; cursor: pointer;">
+      <input type="radio" name="selectedText" value="${second.label}" style="margin-right: 10px;"> 
+      <strong>B:</strong> ${second.text}
+    </label>
+  </div>
+`;
+
+    div.innerHTML = `
+      <p><strong>Trial Sample</strong></p>
+      <audio controls id="trialAudio">
+        <source src="${sample.url_ref}" type="audio/wav">
+        Your browser does not support the audio element.
+      </audio>
+
+
+      <p><strong>After listening to the audio sample, which text description better matches the speech and speaker?</strong></p>
+      <div class="rating">${choiceHTML}</div>
+
+      <p><strong>What is the main reason for your choice? That is, for each quality below which description is a better match to the speech sample for that specific quality?</strong></p>
+      <div class="rating">${influenceHTML}</div>
+
+      <p><strong>How confident are you in your judgement?</strong></p>
+      <div class="rating">${confidenceHTML}</div>
+
+      <button class="button" onclick="nextTrial()">Next</button>
+    `;
+    container.appendChild(div);
+  }
+
+  function nextTrial() {
+    const selected = document.querySelector('input[name="selectedText"]:checked');
+    const selectedConfidence = document.querySelector('input[name="trialConfidenceRating"]:checked');
+    // const influences = Array.from(document.querySelectorAll('input[name="influences"]:checked')).map(el => el.value);
+    const influenceRatings = {};
+
+    for (let i = 0; i < influenceOptions.length; i++) {
+  const selected = document.querySelector(`input[name="influence_${i}"]:checked`);
+  if (selected) {
+    const aspect = influenceOptions[i];
+    influenceRatings[aspect] = selected.value;
+  }
+}
+    let filled = 0;
+    for (let i = 0; i < numAspects; i++) {
+  if (document.querySelector(`input[name="influence_${i}"]:checked`)) {
+    filled++;
+  }
+}
+    if (!selected || !selectedConfidence || filled<numAspects) {
+      alert("Please select all the categories AND your confidence before proceeding.");
+      return;
+    }
+    results[`Trial ${trialSamples[trialIndex].id}`] = {
+    Text: selected.value,
+    Confidence: selectedConfidence.value,
+    Reasons: influenceRatings
+  };
+  
+  trialIndex++;
+    showTrialSample();
+  }
+
+
+
+
+  function showGetReady() {
+    document.getElementById('trialPage').style.display = 'none';
+    document.getElementById('getReadyPage').style.display = 'block';
+  }
+
+  function startTest() {
+    shuffle(audioSamples);
+    document.getElementById('getReadyPage').style.display = 'none';
+    document.getElementById('mosTestPage').style.display = 'block';
+    showTestSample();
+  }
+
+  function showTestSample() {
+    const container = document.getElementById('testSampleContainer');
+    container.innerHTML = '';
+
+    if (testIndex >= audioSamples.length) {
+    //   finishTest();
+    toFinalQuestion();
+      return;
+    }
+
+    document.getElementById('pausePage').style.display = 'block';
+    document.getElementById('testSampleContainer').style.display = 'none';
+    setTimeout(() => {
+    document.getElementById('pausePage').style.display = 'none';
+    document.getElementById('testSampleContainer').style.display = 'block';
+
+  }, 700); // 0.7 seconds
+
+    const sample = audioSamples[testIndex];
+
+         // Randomize order
+         const [first, second] = shufflePair(
+      {label: 'Para', text: sample.para},
+      {label: 'Vox', text:sample.vox}
+     )
+
+    const div = document.createElement('div');
+
+    // const scaleOptions = ["Very different", "Quite different", "Somewhat similar", "Quite similar", "Very similar"];
+    // shuffle(scaleOptions);
+
+//     const influenceOptions = [
+//   "Sex",
+//   "Age",
+//   "Dialect",
+//   "Emotion",
+//   "Fluency",
+//   "Timbre"
+// ];
+ shuffle(influenceOptions);
+
+//  const influenceHTML = influenceOptions.map(opt =>
+//   `<label><input type="checkbox" name="influences" value="${opt}"> ${opt}</label><br>`
+// ).join('');
+
+let influenceHTML = `
+  <table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>A is better</th>
+        <th>Similar</th>
+        <th>B is better</th>
+      </tr>
+    </thead>
+    <tbody>
+`;
+
+influenceOptions.forEach((opt, i) => {
+  const name = `influence_${i}`;
+  influenceHTML += `
+    <tr>
+      <td>${opt}</td>
+      <td align="center"><input type="radio" name="${name}" value="${first.label}"></td>
+      <td align="center"><input type="radio" name="${name}" value="Similar"></td>
+      <td align="center"><input type="radio" name="${name}" value="${second.label}"></td>
+    </tr>
+  `;
+});
+
+influenceHTML += `</tbody></table>`;
+    let ratingHTML = '';
+    // scaleOptions.forEach(value => {
+    //   ratingHTML += `<label><input type="radio" name="testRating" value="${value}" required> ${value}</label>`;
+    // });
+
+    let confidenceHTML = '';
+    ["Not at all confident", "Slightly confident", "Moderately confident", "Quite confident", "Extremely confident"].forEach(value => {
+      confidenceHTML += `<label><input type="radio" name="confidenceRating" value="${value}" required> ${value}</label>`;
+    });
+
+    const choiceHTML = `
+  <div class="choice">
+    <label style="display: block; border: 1px solid #ccc; padding: 10px; border-radius: 8px; margin-bottom: 10px; cursor: pointer;">
+      <input type="radio" name="selectedText" value="${first.label}" style="margin-right: 10px;"> 
+      <strong>A:</strong> ${first.text}
+    </label>
+    <label style="display: block; border: 1px solid #ccc; padding: 10px; border-radius: 8px; cursor: pointer;">
+      <input type="radio" name="selectedText" value="${second.label}" style="margin-right: 10px;"> 
+      <strong>B:</strong> ${second.text}
+    </label>
+  </div>
+`;
+
+    div.innerHTML = `
+      <p><strong>Sample </strong></p>
+      <audio controls id="testAudio">
+        <source src="${sample.url_ref}" type="audio/wav">
+        Your browser does not support the audio element.
+      </audio>
+
+      <p><strong>After listening to the audio sample, which text description better matches the speech and speaker?</strong></p>
+      <div class="rating">${choiceHTML}</div>
+
+      <p><strong>What is the main reason for your choice? That is, for each quality below which description is a better match to the speech sample for that specific quality?</strong></p>
+      <div class="rating">${influenceHTML}</div>
+
+      <p><strong>How confident are you in your judgement?</strong></p>
+      <div class="rating">${confidenceHTML}</div>
+
+      <button class="button" onclick="nextTest()">Next</button>
+    `;
+    container.appendChild(div);
+  }
+
+  function nextTest() {
+    const selected = document.querySelector('input[name="selectedText"]:checked');
+    const selectedConfidence = document.querySelector('input[name="confidenceRating"]:checked');
+    // const influences = Array.from(document.querySelectorAll('input[name="influences"]:checked')).map(el => el.value);
+    const influenceRatings = {};
+    for (let i = 0; i < influenceOptions.length; i++) {
+  const selected = document.querySelector(`input[name="influence_${i}"]:checked`);
+  if (selected) {
+    const aspect = influenceOptions[i];
+    influenceRatings[aspect] = selected.value;
+  }
+}
+
+    let filled = 0;
+    for (let i = 0; i < numAspects; i++) {
+  if (document.querySelector(`input[name="influence_${i}"]:checked`)) {
+    filled++;
+  }
+}
+
+    if (!selected || !selectedConfidence || filled<numAspects) {
+      alert("Please select all the categories AND your confidence before proceeding.");
+      return;
+    }
+
+    results[`Sample ${audioSamples[testIndex].id}`] = {
+      Text: selected.value,
+      Confidence: selectedConfidence.value,
+      Reasons: influenceRatings
+
+    };
+
+    testIndex++;
+    showTestSample();
+  }
+  function toFinalQuestion() {
+    document.getElementById('mosTestPage').style.display = 'none';
+    document.getElementById('finalQuestionPage').style.display = 'block';
+
+
+}
+  function finishTest() {
+  document.getElementById('finalQuestionPage').style.display = 'none';
+  const eval2 = document.querySelector('input[name="eval2"]:checked').value;
+  results["Participant Info"]["eval2"] = eval2;
+
+  document.getElementById('uploadingPage').style.display = 'block';
+
+  const code = generateCompletionCode();
+  document.getElementById('completionCode').innerText = code;
+
+  results["completionCode"] = code;
+  results["Participant Info"]["taskId"] = taskId
+  const assignmentId = new URLSearchParams(window.location.search).get("assignmentId");
+  const payload = {
+    taskId: taskId,
+    assignmentId: assignmentId || "",
+    completionCode: code,
+    responses: results
+  };
+
+
+const url = "https://q59ciemhpj.execute-api.us-west-1.amazonaws.com/submit"
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  }).then(res => console.log("✅ Submitted to Google Sheets")).catch(err => {
+    console.error("❌ Upload failed:", err);
+    alert("Oops! Could not save your results. Please contact the requester.");
+  });
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filename = `response_${code}_${timestamp}.json`;
+  downloadJSON(results, filename);
+
+setTimeout(() => {
+    document.getElementById('uploadingPage').style.display = 'none';
+    document.getElementById('thankYouPage').style.display = 'block';
+  }, 3000); // 3 seconds
+
+}
+
+  // Prevent multiple audios from playing at once
+  document.addEventListener('play', function(e){
+    const audios = document.getElementsByTagName('audio');
+    for(let i = 0; i < audios.length; i++){
+      if(audios[i] !== e.target){
+        audios[i].pause();
+        audios[i].currentTime = 0;
+      }
+    }
+  }, true);
+
+  // Download JSON locally
+  function downloadJSON(obj, filename){
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", filename);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  }
+
+  function generateCompletionCode() {
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "";
+    for (let i = 0; i < 8; i++) {
+      code += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return code;
+  }
+
+  function selectRadio(cell) {
+  const row = cell.parentElement;
+  const inputs = row.querySelectorAll('input[type="radio"]');
+  const cells = row.querySelectorAll('.radio-cell');
+
+  // Clear all selections for this row
+  cells.forEach(c => c.classList.remove('selected'));
+
+  // Select this one
+  cell.classList.add('selected');
+
+  // Check the radio inside
+  const radio = cell.querySelector('input[type="radio"]');
+  if (radio) radio.checked = true;
+}
+
+</script>
+
+</body>
+</html>
