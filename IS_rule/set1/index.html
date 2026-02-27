@@ -379,7 +379,7 @@ function submitInfo() {
 
     // 1. Perceived Accent (Randomized)
     let accentHTML = '';
-    const trialAccents = ["British English", "North American English", "French-accented English", "Spanish-accented English", "Chinese-accented English", "German-accented English", "Hindi- or Indian-accented English"];
+    const trialAccents =  ["North American English", "Spanish-accented English", "Hindi- or Indian-accented English"];
     shuffle(trialAccents); 
     trialAccents.forEach(val => {
       accentHTML += `<label><input type="radio" name="trialAccent" value="${val}" required> ${val}</label><br>`;
@@ -475,7 +475,7 @@ function submitInfo() {
 
     // 1. Perceived Accent (Randomized)
     let accentHTML = '';
-    const testAccents = ["British English","North American English", "French-accented English", "Spanish-accented English", "Chinese-accented English", "German-accented English", "Hindi- or Indian-accented English"];
+    const testAccents =  ["North American English", "Spanish-accented English", "Hindi- or Indian-accented English"];
     shuffle(testAccents); 
     testAccents.forEach(val => {
       accentHTML += `<label><input type="radio" name="testAccent" value="${val}" required> ${val}</label><br>`;
