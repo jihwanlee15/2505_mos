@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<!-- saved from url=(0039)https://jihwanlee15.github.io/2505_mos/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <title>Synthesized Speech Naturalness Evaluation</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .hidden { display: none; }
+    .button { padding: 10px 20px; font-size: 16px; margin-top: 20px; }
+    .rating label { margin-right: 10px; }
+  </style>
+<script src="./mos_template_files/aws-sdk-2.1487.0.min.js"></script></head>
+
+
+<body>
+
+<!-- Overview Page -->
+<div id="overviewPage">
+<h1>Speech Listening Hunam Evaluation</h1>
+    <div>
+      <h2>Task Overview:</h2>
+      <p>
+        The goal of this task is to evaluate the <strong>accent</strong> and <strong>naturalness</strong> each speech sample.
+        Please listen carefully to each audio clip and rate the speech samples. 
+        
+        <!-- <strong>You must be a native speaker of English or speech researcher to participate in this task.</strong> -->
+      </p>
+    
+      <!-- <h4>Important Notes:</h4>
+      <ul>
+        <li><strong>Submissions from non-native English speakers will be rejected and not compensated.</strong></li>
+        <li>
+          To ensure response quality, some speech samples with clear, undisputed answers have been included.
+          If you fail to answer <strong>more than half of these correctly</strong>, your work may be rejected and unpaid.
+        </li>
+        <li>
+          If you correctly identify <strong>all these samples</strong>, you will receive an
+          <strong>additional bonus reward</strong> for your accuracy and effort.
+        </li>
+      </ul> -->
+    
+      <p>We sincerely appreciate your participation and careful attention!</p>
+      </div>
+<hr>
+<button class="button" onclick="showInstructions()">I understand the task overview and the important notes.</button>
+</div>
+
+<!-- instruction page-->
+<div id="instructionPage" class="hidden">
+<h2>Instructions</h2>
+
+<ol>
+    <li>
+      The task is expected to take approximately <strong>10–15 minutes</strong>.
+    </li>
+    <li>
+      Please complete the test in a <strong>quiet environment using headphones</strong> for best audio quality and accurate evaluation.
+    </li>
+    <li>
+      For each sample, you will:
+      <ul>
+        <li><strong>Listen</strong> to the speech sample</li>
+        <!-- <li><strong>Select</strong> the regional dialect</li> -->
+        <li><strong>Rate accent</strong> and <strong>naturalness</strong> the speech sample</li>
+      </ul>
+      Once both responses are selected, click <strong>Next</strong> to continue to the following sample.<br>
+      You may listen to each speech sample as many times as you'd like, but you won't be able to go back after clicking the <strong>Next</strong> button.
+    </li>
+    <li>
+      Before the main test, you will complete a brief <strong>trial session</strong> to get familiar with the task format.
+    </li>
+    <li>
+      <!-- After completing the task, <strong>return to MTurk and submit your confirmation code</strong>. This code is generated only once. You may not be compensated if you fail to submit it. -->
+      After completing the task, a response file will be automatically downloaded to your local computer. <br><strong>Please send the reponse file to Jihwan Lee (jihwan@usc.edu).</strong> Thank you.
+
+    </li>
+  </ol>
+  
+<hr>
+<button class="button" onclick="showConsent()">I carefully read and understood the instructions, Continue</button>
+</div>
+
+<div id="consentPage" class="hidden">
+  <h2>Consent Form</h2>
+  <p>
+    You are invited to participate in a speech evaluation study. In this task, you will listen to speech samples and evaluate their accents and naturalness. Your participation is voluntary, and you may withdraw at any time.
+  </p>
+  <p>
+    No personal identifying information will be collected. By clicking "I Agree," you confirm that you are a fluent speaker of English or speech researcher, at least 18 years old, and voluntarily consent to participate.
+  </p>
+  <hr>
+  <button class="button" onclick="showParticipantInfo()">I Agree, Continue</button>
+</div>
+
+<!-- Participant Info Page -->
+<div id="participantInfoPage" class="hidden">
+    <h2>Evaluator Information</h2>
+    <p>Please provide a few details before starting:</p>
+  
+    <label>Age: <input type="number" id="ageInput" min="18" required=""></label><br><br>
+    <label>Gender:
+      <select id="genderInput" required="">
+        <option value="">Select</option>
+        <option value="Female">Female</option>
+        <option value="Male">Male</option>
+        <option value="Other">Other</option>
+      </select>
+    </label><br><br>
+  
+<label>Native Language:
+  <select id="nativeInput" required onchange="toggleOtherLanguage(this.value)">
+    <option value="">Select</option>
+    <option value="US">US English</option>
+    <option value="Greek">Greek</option>
+    <option value="Japanese">Japanese</option>
+    <option value="Korean">Korean</option>
+    <option value="Chinese">Chinese</option>
+    <option value="Thai">Thai</option>
+    <option value="Vietnamese">Vietnamese</option>
+    <option value="Danish">Danish</option>
+    <option value="Norwegian">Norwegian</option>
+    <option value="Indian Languages">Indian Languages</option>
+    <option value="Spanish">Spanish</option>
+    <option value="Other">Other (Please specify)</option>
+  </select>
+</label>
+
+
+
+<input type="text" id="otherNativeInput" placeholder="Type your language here" style="display: none; margin-left: 10px;">
+<br><br>
+
+<label>How many years have you lived an English speaking country: <input type="number" id="engInput" min="0" required=""></label><br><br>
+
+
+<h3>What are you evaluating in this task?</h3>
+<div class="rating">
+  <label><input type="checkbox" name="eval1[]" value="naturalness">naturalness</label>
+  <label><input type="checkbox" name="eval1[]" value="speaker">speaker similarity</label>
+  <label><input type="checkbox" name="eval1[]" value="accent">accent</label>
+  <label><input type="checkbox" name="eval1[]" value="emotion">emotion</label>
+  <label><input type="checkbox" name="eval1[]" value="fluency">fluency</label>
+  </div>
+
+    <button class="button" onclick="submitInfo()">Submit &amp; Start Trials</button>
+  </label></div>
+  
+
+<!-- Trial Page -->
+<div id="trialPage" class="hidden">
+  <h2>Trial Session</h2>
+  <p>Listen to each trial sample and rate it before moving to the next.</p>
+  <hr>
+  <div id="trialSampleContainer"></div>
+</div>
+
+<!-- Get Ready Page -->
+<div id="getReadyPage" class="hidden">
+  <h2>Get Ready!</h2>
+  <p>You’ve completed the trial session. The actual evaluation test begins now.</p>
+  <p>Please pay close attention to each audio and provide your best judgement.</p>
+  <button class="button" onclick="startTest()">Start Test</button>
+</div>
+
+<!-- Main Test Page -->
+<div id="mosTestPage" class="hidden">
+  <h2>Main Test</h2>
+  <p>Listen to each sample and evaluate both the dialect and your confidence before moving to the next.</p>
+  <hr>
+  <div id="testSampleContainer"></div>
+</div>
+
+<!-- Final Question Page -->
+<div id="finalQuestionPage" class="hidden">
+    <h3>What were you evaluating in this task?</h3>
+    <div class="rating">
+      <label><input type="checkbox" name="eval2[]" value="naturalness" required="">naturalness</label>
+      <label><input type="checkbox" name="eval2[]" value="speaker">speaker similarity</label>
+      <label><input type="checkbox" name="eval2[]" value="accent">accent</label>
+      <label><input type="checkbox" name="eval2[]" value="emotion">emotion</label>
+      <label><input type="checkbox" name="eval2[]" value="fluency">fluency</label>
+    </div>
+
+    <hr>
+
+    <h3>How many years of experience do you have with each of the following accents?</h3>
+    <p><em>(Please enter 0 if you have no experience with a specific accent)</em></p>
+    
+    <label>North American English: <input type="number" id="expNA" min="0" required></label><br><br>
+    <label>French-accented English: <input type="number" id="expFrench" min="0" required></label><br><br>
+    <label>Spanish-accented English: <input type="number" id="expSpanish" min="0" required></label><br><br>
+    <label>Chinese-accented English: <input type="number" id="expChinese" min="0" required></label><br><br>
+    <label>German-accented English: <input type="number" id="expGerman" min="0" required></label><br><br>
+    <label>Hindi- or Indian-accented English: <input type="number" id="expHindi" min="0" required></label><br><br>
+
+    <button class="button" onclick="finishTest()">Submit</button>
+</div>
+
+<!-- Uploading Page -->
+<div id="uploadingPage" class="hidden">
+    <h2>Uploading Your Responses...</h2>
+    <p>Please wait a moment while we save your data.</p>
+  </div>
+
+  <!-- Pause Page -->
+<div id="pausePage" class="hidden">
+    <h2>Loading next item...</h2>
+    <p>Please wait a moment....</p>
+  </div>
+
+  <!-- Thank You Page -->
+<div id="thankYouPage" class="hidden">
+    <h2>Thank You!</h2>
+    <p>Your responses have been recorded successfully.</p>
+    <p>We sincerely appreciate your participation in this study.</p>
+    <p><strong>Your completion code:</strong></p>
+    <p style="font-size: 24px; font-weight: bold;" id="completionCode">LOADING...</p>
+  
+      <p>Sometimes the responses fail to upload automatically, so please <strong>send the json file to Jihwan Lee</strong> (jihwan@usc.edu).</p>
+
+
+    <!-- <p>Return to MTurk and paste this code into the HIT submission box.</p> -->
+    <!-- <p>Click the button below to return to MTurk and submit your work.</p> -->
+<!-- <a href="https://www.mturk.com/mturk/externalSubmit?assignmentId=${assignmentId}" class="button">Submit to MTurk</a> -->
+  </div>
+
+<script>
+
+  const taskId = 'TaskVector-set1'
+  // Sample data (replace with your actual file URLs)
+  const trialSamples = [
+    { id: 'T1', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/trials/US.wav' },
+    { id: 'T2', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/trials/Spanish.wav' },
+    { id: 'T3', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/trials/Indian.wav' }
+  ];
+  const audioSamples = [
+{id: '1-0', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/cn_0.wav' },
+{id: '1-1', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/cn_1.wav' },
+{id: '1-2', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/cn_2.wav' },
+{id: '1-3', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/cn_3.wav' },
+{id: '1-4', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/cn_4.wav' },
+{id: '1-5', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/de_0.wav' },
+{id: '1-6', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/de_1.wav' },
+{id: '1-7', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/de_2.wav' },
+{id: '1-8', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/de_3.wav' },
+{id: '1-9', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/de_4.wav' },
+{id: '1-10', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/fr_0.wav' },
+{id: '1-11', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/fr_1.wav' },
+{id: '1-12', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/fr_2.wav' },
+{id: '1-13', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/fr_3.wav' },
+{id: '1-14', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/fr_4.wav' },
+{id: '1-15', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/en_0.wav' },
+{id: '1-16', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/en_1.wav' },
+{id: '1-17', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/en_2.wav' },
+{id: '1-18', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/en_3.wav' },
+{id: '1-19', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/en_4.wav' },
+{id: '1-20', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/es_0.wav' },
+{id: '1-21', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/es_1.wav' },
+{id: '1-22', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/es_2.wav' },
+{id: '1-23', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/es_3.wav' },
+{id: '1-24', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/es_4.wav' },
+{id: '1-25', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/hi_0.wav' },
+{id: '1-26', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/hi_1.wav' },
+{id: '1-27', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/hi_2.wav' },
+{id: '1-28', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/hi_3.wav' },
+{id: '1-29', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/hi_4.wav' },
+{id: '1-30', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/us_0.wav' },
+{id: '1-31', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/us_1.wav' },
+{id: '1-32', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/us_2.wav' },
+{id: '1-33', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/us_3.wav' },
+{id: '1-34', url: 'https://jihwan-public.s3.us-west-1.amazonaws.com/2602_thanathai_IS/taskvector/us_4.wav' }
+]
+
+
+  let trialIndex = 0;
+  let testIndex = 0;
+  const results = {};
+
+
+
+  // Shuffle utility
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+function toggleOtherLanguage(selectedValue) {
+  const otherInput = document.getElementById('otherNativeInput');
+  if (selectedValue === 'Other') {
+    otherInput.style.display = 'inline-block';
+    otherInput.required = true;
+  } else {
+    otherInput.style.display = 'none';
+    otherInput.required = false;
+    otherInput.value = ''; // Clear the input if they change their mind
+  }
+}
+  function showParticipantInfo() {
+  document.getElementById('consentPage').style.display = 'none';
+  document.getElementById('participantInfoPage').style.display = 'block';
+}
+
+function showInstructions() {
+    document.getElementById('overviewPage').style.display = 'none';
+    document.getElementById('instructionPage').style.display = 'block';
+
+}
+
+function showConsent() {
+    document.getElementById('instructionPage').style.display = 'none';
+    document.getElementById('consentPage').style.display = 'block';
+
+}
+
+function submitInfo() {
+  const age = document.getElementById('ageInput').value;
+  const gender = document.getElementById('genderInput').value;
+  const native = document.getElementById('nativeInput').value;
+  // If 'Other' is selected, grab the text from the custom input box instead
+  if (native === 'Other') {
+    native = document.getElementById('otherNativeInput').value;
+  }
+  
+  // 1. Grab the new engInput value
+  const engYears = document.getElementById('engInput').value; 
+  
+  // 2. Grab all checked boxes using the correct name attribute
+  const checkedBoxes = document.querySelectorAll('input[name="eval1[]"]:checked');
+  const eval1Values = Array.from(checkedBoxes).map(cb => cb.value);
+
+  // 3. Validate that ALL fields (including engYears) are filled out
+  if (!age || !gender || !native || !engYears || eval1Values.length === 0) {
+    alert("Please fill in all required fields before proceeding.");
+    return;
+  }
+  
+  document.getElementById('participantInfoPage').style.display = 'none';
+
+  // 4. Save everything to your results object
+  results["Participant Info"] = {
+    Age: age,
+    Gender: gender,
+    NativeLanguage: native,
+    YearsInEnglishCountry: engYears, // Saved here!
+    eval1: eval1Values 
+  };
+
+  startTrials();
+}
+
+
+  // Start trials
+  function startTrials() {
+    // shuffle(trialSamples);
+    // document.getElementById('consentPage').style.display = 'none';
+    document.getElementById('trialPage').style.display = 'block';
+    showTrialSample();
+  }
+
+  function showTrialSample() {
+    const container = document.getElementById('trialSampleContainer');
+    container.innerHTML = '';
+
+    if (trialIndex >= trialSamples.length) {
+      showGetReady();
+      return;
+    }
+
+    const sample = trialSamples[trialIndex];
+    const div = document.createElement('div');
+
+    document.getElementById('pausePage').style.display = 'block';
+    document.getElementById('trialSampleContainer').style.display = 'none';
+    setTimeout(() => {
+      document.getElementById('pausePage').style.display = 'none';
+      document.getElementById('trialSampleContainer').style.display = 'block';
+    }, 700); // 0.7 seconds
+
+    // 1. Perceived Accent (Randomized)
+    let accentHTML = '';
+    const trialAccents = ["British English", "North American English", "French-accented English", "Spanish-accented English", "Chinese-accented English", "German-accented English", "Hindi- or Indian-accented English"];
+    shuffle(trialAccents); 
+    trialAccents.forEach(val => {
+      accentHTML += `<label><input type="radio" name="trialAccent" value="${val}" required> ${val}</label><br>`;
+    });
+
+    // 2. Accent Strength
+    let strengthHTML = '';
+    ["1 - Not at all prominent", "2 - Slightly prominent", "3 - Moderately prominent", "4 - Quite prominent", "5 - Extremely prominent"].forEach(val => {
+      strengthHTML += `<label><input type="radio" name="trialStrength" value="${val}" required> ${val}</label><br>`;
+    });
+
+    // 3. Human vs AI
+    let humanHTML = '';
+    ["1 - Not at all natural", "2 - Slightly natural", "3 - Moderately natural", "4 - Quite natural", "5 - Extremely natural"].forEach(val => {
+      humanHTML += `<label><input type="radio" name="trialHuman" value="${val}" required> ${val}</label><br>`;
+    });
+
+    div.innerHTML = `
+      <p><strong>Trial Sample</strong></p>
+      <audio controls id="trialAudio">
+        <source src="${sample.url}" type="audio/wav">
+        Your browser does not support the audio element.
+      </audio>
+      <br><br>
+
+      <p><strong>1. Which dialect or accent do you perceive in this recording?</strong></p>
+      <div class="rating">${accentHTML}</div><br>
+
+      <p><strong>2. How prominent is the perceived accent?</strong></p>
+      <div class="rating">${strengthHTML}</div><br>
+
+      <p><strong>3. How closely does this sample resemble natural human speech?</strong></p>
+      <div class="rating">${humanHTML}</div><br>
+
+      <button class="button" onclick="nextTrial()">Next</button>
+    `;
+    container.appendChild(div);
+  }
+
+  function nextTrial() {
+    const selectedAccent = document.querySelector('input[name="trialAccent"]:checked');
+    const selectedStrength = document.querySelector('input[name="trialStrength"]:checked');
+    const selectedHuman = document.querySelector('input[name="trialHuman"]:checked');
+
+    if (!selectedAccent || !selectedStrength || !selectedHuman) {
+      alert("Please answer all 3 questions before proceeding.");
+      return;
+    }
+
+    results[`Trial ${trialSamples[trialIndex].id}`] = {
+      Accent: selectedAccent.value,
+      Strength: selectedStrength.value,
+      HumanLikeness: selectedHuman.value
+    };
+  
+    trialIndex++;
+    showTrialSample();
+  }
+
+
+
+
+  function showGetReady() {
+    document.getElementById('trialPage').style.display = 'none';
+    document.getElementById('getReadyPage').style.display = 'block';
+  }
+
+  function startTest() {
+    shuffle(audioSamples);
+    document.getElementById('getReadyPage').style.display = 'none';
+    document.getElementById('mosTestPage').style.display = 'block';
+    showTestSample();
+  }
+
+  function showTestSample() {
+    const container = document.getElementById('testSampleContainer');
+    container.innerHTML = '';
+
+    if (testIndex >= audioSamples.length) {
+      toFinalQuestion();
+      return;
+    }
+
+    document.getElementById('pausePage').style.display = 'block';
+    document.getElementById('testSampleContainer').style.display = 'none';
+    setTimeout(() => {
+      document.getElementById('pausePage').style.display = 'none';
+      document.getElementById('testSampleContainer').style.display = 'block';
+    }, 700); // 0.7 seconds
+
+    const sample = audioSamples[testIndex];
+    const div = document.createElement('div');
+
+    // 1. Perceived Accent (Randomized)
+    let accentHTML = '';
+    const testAccents = ["British English","North American English", "French-accented English", "Spanish-accented English", "Chinese-accented English", "German-accented English", "Hindi- or Indian-accented English"];
+    shuffle(testAccents); 
+    testAccents.forEach(val => {
+      accentHTML += `<label><input type="radio" name="testAccent" value="${val}" required> ${val}</label><br>`;
+    });
+
+    // 2. Accent Strength
+    let strengthHTML = '';
+    ["1 - Not at all prominent", "2 - Slightly prominent", "3 - Moderately prominent", "4 - Quite prominent", "5 - Extremely prominent"].forEach(val => {
+      strengthHTML += `<label><input type="radio" name="testStrength" value="${val}" required> ${val}</label><br>`;
+    });
+
+    // 3. Human vs AI
+    let humanHTML = '';
+    ["1 - Not at all natural", "2 - Slightly natural", "3 - Moderately natural", "4 - Quite natural", "5 - Extremely natural"].forEach(val => {
+      humanHTML += `<label><input type="radio" name="testHuman" value="${val}" required> ${val}</label><br>`;
+    });
+
+    div.innerHTML = `
+      <p><strong>Sample</strong></p>
+      <audio controls id="testAudio">
+        <source src="${sample.url}" type="audio/wav">
+        Your browser does not support the audio element.
+      </audio>
+      <br><br>
+
+      <p><strong>1. Which dialect or accent do you perceive in this recording?</strong></p>
+      <div class="rating">${accentHTML}</div><br>
+
+      <p><strong>2. How prominent is the perceived accent?</strong></p>
+      <div class="rating">${strengthHTML}</div><br>
+
+      <p><strong>3. How closely does this sample resemble natural human speech?</strong></p>
+      <div class="rating">${humanHTML}</div><br>
+
+      <button class="button" onclick="nextTest()">Next</button>
+    `;
+    container.appendChild(div);
+  }
+  function nextTest() {
+    const selectedAccent = document.querySelector('input[name="testAccent"]:checked');
+    const selectedStrength = document.querySelector('input[name="testStrength"]:checked');
+    const selectedHuman = document.querySelector('input[name="testHuman"]:checked');
+
+    if (!selectedAccent || !selectedStrength || !selectedHuman) {
+      alert("Please answer all 3 questions before proceeding.");
+      return;
+    }
+
+    results[`Sample ${audioSamples[testIndex].id}`] = {
+      Accent: selectedAccent.value,
+      Strength: selectedStrength.value,
+      HumanLikeness: selectedHuman.value
+    };
+
+    testIndex++;
+    showTestSample();
+  }
+  function toFinalQuestion() {
+    document.getElementById('mosTestPage').style.display = 'none';
+    document.getElementById('finalQuestionPage').style.display = 'block';
+
+
+}
+ function finishTest() {
+  // 1. Grab all checked boxes using the correct name attribute
+  const checkedBoxes = document.querySelectorAll('input[name="eval2[]"]:checked');
+  const eval2Values = Array.from(checkedBoxes).map(cb => cb.value);
+
+  // 2. Grab the accent experience values
+  const expNA = document.getElementById('expNA').value;
+  const expFrench = document.getElementById('expFrench').value;
+  const expSpanish = document.getElementById('expSpanish').value;
+  const expChinese = document.getElementById('expChinese').value;
+  const expGerman = document.getElementById('expGerman').value;
+  const expHindi = document.getElementById('expHindi').value;
+
+  // 3. Validate that everything is filled out
+  if (eval2Values.length === 0) {
+    alert("Please select at least one option for what you evaluated.");
+    return;
+  }
+  if (expNA === "" || expFrench === "" || expSpanish === "" || expChinese === "" || expGerman === "" || expHindi === "") {
+    alert("Please enter your years of experience for each accent (enter 0 if you have none).");
+    return;
+  }
+
+  // 4. Hide the final question page
+  document.getElementById('finalQuestionPage').style.display = 'none';
+  
+  // 5. Save the selections and experience to the results object
+  results["Participant Info"]["eval2"] = eval2Values;
+  results["Participant Info"]["AccentExperience"] = {
+    "North American": expNA,
+    "French": expFrench,
+    "Spanish": expSpanish,
+    "Chinese": expChinese,
+    "German": expGerman,
+    "Hindi/Indian": expHindi
+  };
+
+  document.getElementById('uploadingPage').style.display = 'block';
+
+  const code = generateCompletionCode();
+  document.getElementById('completionCode').innerText = code;
+
+  results["completionCode"] = code;
+  results["Participant Info"]["taskId"] = taskId;
+  const assignmentId = new URLSearchParams(window.location.search).get("assignmentId");
+  
+  const payload = {
+    taskId: taskId,
+    assignmentId: assignmentId || "",
+    completionCode: code,
+    responses: results
+  };
+
+  const url = "https://q59ciemhpj.execute-api.us-west-1.amazonaws.com/submit";
+  
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  }).then(res => console.log("✅ Submitted to server")).catch(err => {
+    console.error("❌ Upload failed:", err);
+    alert("Oops! Could not save your results. Please contact the requester.");
+  });
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const filename = `response_${code}_${timestamp}.json`;
+  downloadJSON(results, filename);
+
+  setTimeout(() => {
+    document.getElementById('uploadingPage').style.display = 'none';
+    document.getElementById('thankYouPage').style.display = 'block';
+  }, 3000); // 3 seconds
+}
+
+  // Prevent multiple audios from playing at once
+  document.addEventListener('play', function(e){
+    const audios = document.getElementsByTagName('audio');
+    for(let i = 0; i < audios.length; i++){
+      if(audios[i] !== e.target){
+        audios[i].pause();
+        audios[i].currentTime = 0;
+      }
+    }
+  }, true);
+
+  // Download JSON locally
+  function downloadJSON(obj, filename){
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", filename);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  }
+
+  function generateCompletionCode() {
+    const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "";
+    for (let i = 0; i < 8; i++) {
+      code += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return code;
+  }
+
+</script>
+
+
+
+</body></html>
